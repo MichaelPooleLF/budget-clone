@@ -47,26 +47,50 @@ const format = {
     this.getTransactions(data);
     this.splits.forEach(split => {
       this.transactions.forEach(trans => {
-        if (trans.id === split.transactionIdRef) {
-          split.transaction = trans;
-        }
+        // if (trans.id === split.transactionIdRef) {
+        //   split.transaction = trans;
+        // }
+        this.createOn('split', 'transaction', [split, trans]);
       });
     });
     this.transactions.forEach(trans => {
       this.splits.forEach(split => {
-        if (trans.id === split.transactionIdRef) {
-          if (!trans.splits) {
-            trans.splits = [];
-          }
-          const { id, amount, itemIdRef, transactionIdRef } = split;
-          trans.splits.push({ id, amount, itemIdRef, transactionIdRef });
-        }
+        // if (trans.id === split.transactionIdRef) {
+        //   if (!trans.splits) {
+        //     trans.splits = [];
+        //   }
+        //   const { id, amount, itemIdRef, transactionIdRef } = split;
+        //   trans.splits.push({ id, amount, itemIdRef, transactionIdRef });
+        // }
+        this.createOn('transaction', 'splits', [trans, split]);
       });
     });
   },
   getTransactions: function (data) {
     this.transactions = this.uniqueIds(data, 'transactionId');
     this.get('transactions', 'transactionId', data);
+  },
+  createOn: function (origin, compare, propObj) {
+    // console.log('start');
+    const [originObj, compareObj] = propObj;
+    const idRef = `${compare}IdRef`;
+    if (origin === 'split') {
+      if (compareObj.id === originObj[idRef]) {
+        originObj[compare] = compareObj;
+      }
+    }
+    // console.log(originObj.id, compareObj[idRef])
+    if (originObj.id === compareObj[idRef]) {
+      // console.log('middle');
+      if (!origin[compare]) {
+        originObj[compare] = [];
+      }
+      if (origin === 'transaction') {
+        // console.log('from transactions: ', originObj);
+        const { id, amount, itemIdRef, transactionIdRef } = compareObj;
+        originObj[compare].push({ id, amount, itemIdRef, transactionIdRef });
+      }
+    }
   },
   get: function (property, id, data) {
     data.forEach(dataObj => {
