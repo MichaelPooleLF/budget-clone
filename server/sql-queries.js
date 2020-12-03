@@ -7,15 +7,11 @@ const request = {
       JOIN "transactions" using ("monthId")
       JOIN "splits"       using ("monthId")
       WHERE "monthId" = 1
+  `,
+  groups: `
+    select *
+      from "budgetGroup"
   `
 };
 
 module.exports = request;
-
-// SELECT *
-//   FROM  "months"
-// JOIN  "budgetGroup"  using("monthId")
-// JOIN  "budgetItems"  using("budgetGroupId")
-// JOIN  "transactions" using("budgetItemId")
-// JOIN  "splits"       using("budgetItemId")
-// WHERE "monthId" = 1
