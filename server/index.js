@@ -5,6 +5,7 @@ const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
 const request = require('./sql-queries');
+// const format = require('./format');
 
 const app = express();
 
@@ -21,8 +22,10 @@ app.get('/api/health-check', (req, res, next) => {
 
 app.get('/api/budget', (req, res, next) => {
   db.query(request.budget)
+  // db.query(request.budgetItems)
     .then(result => {
-      return res.json(result.rows[0]);
+      // res.status(200).send(format.budget());
+      res.status(200).json(result.rows);
     })
     .catch(err => next(err));
 });
