@@ -16,12 +16,13 @@ const format = {
     this.getItems(data);
     this.groups.forEach(group => {
       this.items.forEach(item => {
-        if (group.id === item.groupIdRef) {
-          if (!group.items) {
-            group.items = [];
-          }
-          group.items.push(item);
-        }
+        // if (group.id === item.groupIdRef) {
+        //   if (!group.items) {
+        //     group.items = [];
+        //   }
+        //   group.items.push(item);
+        // }
+        this.createOn('group', 'items', [group, item]);
       });
     });
     return this.groups;
@@ -32,12 +33,13 @@ const format = {
     this.getSplits(data);
     this.items.forEach(item => {
       this.splits.forEach(split => {
-        if (item.id === split.itemIdRef) {
-          if (!item.splits) {
-            item.splits = [];
-          }
-          item.splits.push(split);
-        }
+      //   if (item.id === split.itemIdRef) {
+      //     if (!item.splits) {
+      //       item.splits = [];
+      //     }
+      //     item.splits.push(split);
+      //   }
+        this.createOn('item', 'splits', [item, split]);
       });
     });
   },
@@ -45,15 +47,8 @@ const format = {
     this.splits = this.uniqueIds(data, 'splitId');
     this.get('splits', 'splitId', data);
     this.getTransactions(data);
-    this.splits.forEach(split => {
-      this.transactions.forEach(trans => {
-        // if (trans.id === split.transactionIdRef) {
-        //   split.transaction = trans;
-        // }
-        this.createOn('split', 'transaction', [split, trans]);
-      });
-    });
     this.transactions.forEach(trans => {
+      // console.log(trans);
       this.splits.forEach(split => {
         // if (trans.id === split.transactionIdRef) {
         //   if (!trans.splits) {
@@ -65,30 +60,37 @@ const format = {
         this.createOn('transaction', 'splits', [trans, split]);
       });
     });
+    this.splits.forEach(split => {
+      this.transactions.forEach(trans => {
+        // if (trans.id === split.transactionIdRef) {
+        //   split.transaction = trans;
+        // }
+        this.createOn('split', 'transaction', [split, trans]);
+      });
+    });
   },
   getTransactions: function (data) {
     this.transactions = this.uniqueIds(data, 'transactionId');
     this.get('transactions', 'transactionId', data);
   },
   createOn: function (origin, compare, propObj) {
-    // console.log('start');
     const [originObj, compareObj] = propObj;
-    const idRef = `${compare}IdRef`;
+    let idRef = `${origin}IdRef`;
     if (origin === 'split') {
+      idRef = `${compare}IdRef`;
       if (compareObj.id === originObj[idRef]) {
         originObj[compare] = compareObj;
       }
     }
-    // console.log(originObj.id, compareObj[idRef])
     if (originObj.id === compareObj[idRef]) {
-      // console.log('middle');
-      if (!origin[compare]) {
+      if (!originObj[compare]) {
         originObj[compare] = [];
       }
       if (origin === 'transaction') {
-        // console.log('from transactions: ', originObj);
         const { id, amount, itemIdRef, transactionIdRef } = compareObj;
         originObj[compare].push({ id, amount, itemIdRef, transactionIdRef });
+      } else {
+        originObj[compare].push(compareObj);
       }
     }
   },
