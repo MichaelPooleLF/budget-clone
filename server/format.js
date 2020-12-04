@@ -14,85 +14,65 @@ const format = {
     this.groups = this.uniqueIds(data, 'groupId');
     this.get('groups', 'groupId', data);
     this.getItems(data);
-    this.groups.forEach(group => {
-      this.items.forEach(item => {
-        // if (group.id === item.groupIdRef) {
-        //   if (!group.items) {
-        //     group.items = [];
-        //   }
-        //   group.items.push(item);
-        // }
-        this.createOn('group', 'items', [group, item]);
-      });
-    });
+    this.addProp('items').to('groups');
     return this.groups;
   },
   getItems: function (data) {
     this.items = this.uniqueIds(data, 'itemId');
     this.get('items', 'itemId', data);
     this.getSplits(data);
-    this.items.forEach(item => {
-      this.splits.forEach(split => {
-      //   if (item.id === split.itemIdRef) {
-      //     if (!item.splits) {
-      //       item.splits = [];
-      //     }
-      //     item.splits.push(split);
-      //   }
-        this.createOn('item', 'splits', [item, split]);
-      });
-    });
+    this.addProp('splits').to('items');
   },
   getSplits: function (data) {
     this.splits = this.uniqueIds(data, 'splitId');
     this.get('splits', 'splitId', data);
     this.getTransactions(data);
-    this.transactions.forEach(trans => {
-      // console.log(trans);
-      this.splits.forEach(split => {
-        // if (trans.id === split.transactionIdRef) {
-        //   if (!trans.splits) {
-        //     trans.splits = [];
-        //   }
-        //   const { id, amount, itemIdRef, transactionIdRef } = split;
-        //   trans.splits.push({ id, amount, itemIdRef, transactionIdRef });
-        // }
-        this.createOn('transaction', 'splits', [trans, split]);
-      });
-    });
-    this.splits.forEach(split => {
-      this.transactions.forEach(trans => {
-        // if (trans.id === split.transactionIdRef) {
-        //   split.transaction = trans;
-        // }
-        this.createOn('split', 'transaction', [split, trans]);
-      });
-    });
+    this.addProp('transactions').to('splits');
   },
   getTransactions: function (data) {
     this.transactions = this.uniqueIds(data, 'transactionId');
     this.get('transactions', 'transactionId', data);
+    this.addProp('splits').to('transactions');
   },
-  createOn: function (origin, compare, propObj) {
-    const [originObj, compareObj] = propObj;
-    let idRef = `${origin}IdRef`;
-    if (origin === 'split') {
-      idRef = `${compare}IdRef`;
-      if (compareObj.id === originObj[idRef]) {
-        originObj[compare] = compareObj;
+  addProp: propName => {
+    return {
+      to: parentName => {
+        format[parentName].forEach(parentEl => {
+          format[propName].forEach(propEl => {
+            format.createOn(parentName, propName, [parentEl, propEl]);
+          });
+        });
+      }
+    };
+  },
+  createOn: function (parentName, propName, elements) {
+    let [parentEl, propEl] = elements;
+    let idRef = `${parentName}IdRef`;
+
+    if (parentName === 'splits') {
+      idRef = `${propName}IdRef`;
+      if (propEl.id === parentEl[idRef]) {
+        parentEl[propName] = propEl;
       }
     }
-    if (originObj.id === compareObj[idRef]) {
-      if (!originObj[compare]) {
-        originObj[compare] = [];
+
+    if (parentEl.id === propEl[idRef]) {
+      if (!parentEl[propName]) {
+        parentEl[propName] = [];
       }
-      if (origin === 'transaction') {
-        const { id, amount, itemIdRef, transactionIdRef } = compareObj;
-        originObj[compare].push({ id, amount, itemIdRef, transactionIdRef });
-      } else {
-        originObj[compare].push(compareObj);
+
+      if (parentName === 'transactions') {
+        // console.log(propEl);
+        // const { id, amount, itemsIdRef, transactionsIdRef } = propEl;
+        const { ...propCopy } = propEl;
+        propEl = propCopy;
       }
+      // parentEl[propName].push({ id, amount, itemsIdRef, transactionsIdRef });
+      // parentEl[propName].push(propEl);
+      // } else {
+      parentEl[propName].push(propEl);
     }
+    // }
   },
   get: function (property, id, data) {
     data.forEach(dataObj => {
@@ -129,15 +109,15 @@ const format = {
         spent: data.spent,
         dueDate: data.dueDate,
         repeat: data.repeat,
-        groupIdRef: data.groupIdRef
+        groupsIdRef: data.groupIdRef
       };
     },
     splits: function (index, data, formatObj) {
       formatObj.splits[index] = {
         id: data.splitId,
         amount: data.splitAmount,
-        itemIdRef: data.itemIdRef,
-        transactionIdRef: data.transactionIdRef
+        itemsIdRef: data.itemIdRef,
+        transactionsIdRef: data.transactionIdRef
       };
     },
     transactions: function (index, data, formatObj) {
