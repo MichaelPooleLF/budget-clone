@@ -62,14 +62,10 @@ const format = {
       }
 
       if (parentName === 'transactions') {
-        // console.log(propEl);
-        // const { id, amount, itemsIdRef, transactionsIdRef } = propEl;
         const { ...propCopy } = propEl;
         propEl = propCopy;
       }
-      // parentEl[propName].push({ id, amount, itemsIdRef, transactionsIdRef });
-      // parentEl[propName].push(propEl);
-      // } else {
+
       parentEl[propName].push(propEl);
     }
     // }
