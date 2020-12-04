@@ -10,92 +10,128 @@ const format = {
 
     return month;
   },
+
   getGroups: function (data) {
     this.groups = this.uniqueIds(data, 'groupId');
-    this.get('groups', 'groupId', data);
+
+    this.create('groups').from(data).using('groupId');
     this.getItems(data);
-    this.groups.forEach(group => {
-      this.items.forEach(item => {
-        if (group.id === item.groupIdRef) {
-          if (!group.items) {
-            group.items = [];
-          }
-          group.items.push(item);
-        }
-      });
-    });
+    this.addProp('items').to('groups');
+
     return this.groups;
   },
+
   getItems: function (data) {
     this.items = this.uniqueIds(data, 'itemId');
-    this.get('items', 'itemId', data);
+
+    this.create('items').from(data).using('itemId');
     this.getSplits(data);
-    this.items.forEach(item => {
-      this.splits.forEach(split => {
-        if (item.id === split.itemIdRef) {
-          if (!item.splits) {
-            item.splits = [];
-          }
-          item.splits.push(split);
-        }
-      });
-    });
+    this.addProp('splits').to('items');
   },
+
   getSplits: function (data) {
     this.splits = this.uniqueIds(data, 'splitId');
-    this.get('splits', 'splitId', data);
+
+    this.create('splits').from(data).using('splitId');
     this.getTransactions(data);
-    this.splits.forEach(split => {
-      this.transactions.forEach(trans => {
-        if (trans.id === split.transactionIdRef) {
-          split.transaction = trans;
-        }
-      });
-    });
-    this.transactions.forEach(trans => {
-      this.splits.forEach(split => {
-        if (trans.id === split.transactionIdRef) {
-          if (!trans.splits) {
-            trans.splits = [];
-          }
-          const { id, amount, itemIdRef, transactionIdRef } = split;
-          trans.splits.push({ id, amount, itemIdRef, transactionIdRef });
-        }
-      });
-    });
+    this.addProp('transactions').to('splits');
   },
+
   getTransactions: function (data) {
     this.transactions = this.uniqueIds(data, 'transactionId');
-    this.get('transactions', 'transactionId', data);
+
+    this.create('transactions').from(data).using('transactionId');
+    this.addProp('splits').to('transactions');
   },
-  get: function (property, id, data) {
-    data.forEach(dataObj => {
-      const index = this[property].indexOf(dataObj[id]);
-      const inArray = index !== -1;
-      if (inArray) {
-        this.set[property](index, dataObj, this);
+
+  addProp: function (propName) {
+    return {
+
+      to: function (parentName) {
+        format[parentName].forEach(parentEl => {
+          format[propName].forEach(propEl => {
+            format.create(propName).on(parentName).using([parentEl, propEl]);
+          });
+        });
       }
-    });
+    };
   },
+
+  create: function (propName) {
+    return {
+
+      from: function (data) {
+        return {
+
+          using: function (id) {
+            data.forEach(dataObj => {
+              const index = format[propName].indexOf(dataObj[id]);
+              const inArray = index !== -1;
+              if (inArray) {
+                format.set[propName](index, dataObj);
+              }
+            });
+          }
+        };
+      },
+
+      on: function (parentName) {
+        return {
+
+          using: function (elements) {
+            let [parentEl, propEl] = elements;
+            let idRef = `${parentName}IdRef`;
+
+            if (parentName === 'splits') {
+              idRef = `${propName}IdRef`;
+
+              if (propEl.id === parentEl[idRef]) {
+                parentEl[propName] = propEl;
+              }
+            }
+
+            if (parentEl.id === propEl[idRef]) {
+              if (parentName === 'transactions') {
+                const { ...propCopy } = propEl;
+                propEl = propCopy;
+              }
+
+              if (!parentEl[propName]) {
+                parentEl[propName] = [];
+              }
+
+              parentEl[propName].push(propEl);
+            }
+          }
+        };
+      }
+    };
+  },
+
   uniqueIds: function (data, type) {
     const idSet = new Set();
+
     data.forEach(dataObj => {
       idSet.add(dataObj[type]);
     });
+
     const idArr = [...idSet];
+
     return idArr;
   },
+
   set: {
-    groups: function (index, data, formatObj) {
-      formatObj.groups[index] = {
+    groups: function (index, data) {
+      format.groups[index] = {
         id: data.groupId,
         name: data.groupName,
         order: data.groupOrder,
         type: data.budgetType
       };
     },
-    items: function (index, data, formatObj) {
-      formatObj.items[index] = {
+
+    items: function (index, data) {
+      format.items[index] = {
         id: data.itemId,
         name: data.itemName,
         order: data.itemOrder,
@@ -103,19 +139,21 @@ const format = {
         spent: data.spent,
         dueDate: data.dueDate,
         repeat: data.repeat,
-        groupIdRef: data.groupIdRef
+        groupsIdRef: data.groupIdRef
       };
     },
-    splits: function (index, data, formatObj) {
-      formatObj.splits[index] = {
+
+    splits: function (index, data) {
+      format.splits[index] = {
         id: data.splitId,
         amount: data.splitAmount,
-        itemIdRef: data.itemIdRef,
-        transactionIdRef: data.transactionIdRef
+        itemsIdRef: data.itemIdRef,
+        transactionsIdRef: data.transactionIdRef
       };
     },
-    transactions: function (index, data, formatObj) {
-      formatObj.transactions[index] = {
+
+    transactions: function (index, data) {
+      format.transactions[index] = {
         id: data.transactionId,
         name: data.transactionName,
         type: data.transactionType,
