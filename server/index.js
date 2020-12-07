@@ -40,7 +40,6 @@ app.get('/api/budget', (req, res, next) => {
 app.post('/api/groups', (req, res, next) => {
   const { groupOrder, monthId } = req.body;
 
-  // if (!groupName) groupName = 'Untitled';
   if (!integer(res, groupOrder, 'groupOrder')) return;
   if (!integer(res, monthId, 'monthId')) return;
 
@@ -50,9 +49,17 @@ app.post('/api/groups', (req, res, next) => {
     .catch(err => next(err));
 });
 
-// app.post('/api/items', (req, res, next) => {
-//   let {itemName, repeat, itemOrder, }
-// })
+app.post('/api/items', (req, res, next) => {
+  const { itemOrder, groupIdRef } = req.body;
+
+  if (!integer(res, itemOrder, 'itemOrder')) return;
+  if (!integer(res, groupIdRef, 'groupIdRef')) return;
+
+  const params = [itemOrder, groupIdRef];
+  db.query(post.item, params)
+    .then(data => res.status(201).json(data.rows[0]))
+    .catch(err => next(err));
+});
 
 app.use('/api', (req, res, next) => {
   next(new ClientError(`cannot ${req.method} ${req.originalUrl}`, 404));

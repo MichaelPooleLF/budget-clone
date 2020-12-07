@@ -5,8 +5,8 @@ const post = {
       RETURNING *
   `,
   item: `
-    INSERT INTO "budgetItems" ("itemOrder", "groupIdRef", "monthId")
-      VALUES ($1, $2, $3)
+    INSERT INTO "budgetItems" ("itemOrder", "groupIdRef")
+      VALUES ($1, $2)
       RETURNING *
   `,
   transaction: ''
