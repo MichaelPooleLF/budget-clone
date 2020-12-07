@@ -23,6 +23,7 @@ ALTER TABLE IF EXISTS ONLY public.months DROP CONSTRAINT IF EXISTS months_pkey;
 ALTER TABLE IF EXISTS ONLY public."budgetItems" DROP CONSTRAINT IF EXISTS "budgetItems_pkey";
 ALTER TABLE IF EXISTS ONLY public."budgetItems" DROP CONSTRAINT IF EXISTS "budgetItems_order_key";
 ALTER TABLE IF EXISTS ONLY public."budgetGroup" DROP CONSTRAINT IF EXISTS "budgetGroup_pkey";
+ALTER TABLE IF EXISTS ONLY public."budgetGroup" DROP CONSTRAINT IF EXISTS "budgetGroup_groupOrder_key";
 ALTER TABLE IF EXISTS public.users ALTER COLUMN "userId" DROP DEFAULT;
 ALTER TABLE IF EXISTS public.transactions ALTER COLUMN "transactionId" DROP DEFAULT;
 ALTER TABLE IF EXISTS public.splits ALTER COLUMN "splitId" DROP DEFAULT;
@@ -31,19 +32,15 @@ ALTER TABLE IF EXISTS public."budgetItems" ALTER COLUMN "itemId" DROP DEFAULT;
 ALTER TABLE IF EXISTS public."budgetGroup" ALTER COLUMN "groupId" DROP DEFAULT;
 DROP SEQUENCE IF EXISTS public."users_userId_seq";
 DROP TABLE IF EXISTS public.users;
-DROP TABLE IF EXISTS public."userMonth";
 DROP SEQUENCE IF EXISTS public."transactions_transactionId_seq";
 DROP TABLE IF EXISTS public.transactions;
 DROP SEQUENCE IF EXISTS public."splits_splitId_seq";
 DROP TABLE IF EXISTS public.splits;
 DROP SEQUENCE IF EXISTS public."months_monthId_seq";
 DROP TABLE IF EXISTS public.months;
-DROP TABLE IF EXISTS public."monthBudgetGroup";
-DROP TABLE IF EXISTS public."itemTransactionSplits";
 DROP SEQUENCE IF EXISTS public."budgetItems_budgetItemId_seq";
 DROP TABLE IF EXISTS public."budgetItems";
 DROP SEQUENCE IF EXISTS public."budgetGroup_budgetGroupId_seq";
-DROP TABLE IF EXISTS public."budgetGroupItems";
 DROP TABLE IF EXISTS public."budgetGroup";
 DROP EXTENSION IF EXISTS plpgsql;
 DROP SCHEMA IF EXISTS public;
@@ -85,20 +82,10 @@ SET default_with_oids = false;
 
 CREATE TABLE public."budgetGroup" (
     "groupId" integer NOT NULL,
-    "groupName" text NOT NULL,
-    "budgetType" text NOT NULL,
     "groupOrder" integer NOT NULL,
-    "monthId" integer NOT NULL
-);
-
-
---
--- Name: budgetGroupItems; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public."budgetGroupItems" (
-    "budgetGroupId" integer NOT NULL,
-    "budgetItemId" integer NOT NULL
+    "monthId" integer NOT NULL,
+    "groupName" text DEFAULT 'Untitled'::text NOT NULL,
+    "budgetType" text DEFAULT 'expense'::text NOT NULL
 );
 
 
@@ -134,8 +121,7 @@ CREATE TABLE public."budgetItems" (
     planned numeric(14,2) DEFAULT 0.00 NOT NULL,
     spent numeric(14,2) DEFAULT 0.00 NOT NULL,
     "dueDate" date,
-    "groupIdRef" integer NOT NULL,
-    "monthId" integer NOT NULL
+    "groupIdRef" integer NOT NULL
 );
 
 
@@ -157,27 +143,6 @@ CREATE SEQUENCE public."budgetItems_budgetItemId_seq"
 --
 
 ALTER SEQUENCE public."budgetItems_budgetItemId_seq" OWNED BY public."budgetItems"."itemId";
-
-
---
--- Name: itemTransactionSplits; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public."itemTransactionSplits" (
-    "budgetItemId" integer NOT NULL,
-    "transactionId" integer NOT NULL,
-    "splitId" integer NOT NULL
-);
-
-
---
--- Name: monthBudgetGroup; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public."monthBudgetGroup" (
-    "monthId" integer NOT NULL,
-    "budgetGroupId" integer NOT NULL
-);
 
 
 --
@@ -220,8 +185,7 @@ CREATE TABLE public.splits (
     "splitId" integer NOT NULL,
     "splitAmount" numeric(14,2) NOT NULL,
     "itemIdRef" integer NOT NULL,
-    "transactionIdRef" integer NOT NULL,
-    "monthId" integer NOT NULL
+    "transactionIdRef" integer NOT NULL
 );
 
 
@@ -256,8 +220,7 @@ CREATE TABLE public.transactions (
     deleted text DEFAULT 'false'::text NOT NULL,
     "checkNum" text,
     note text,
-    "transactionDate" date NOT NULL,
-    "monthId" integer NOT NULL
+    "transactionDate" date NOT NULL
 );
 
 
@@ -279,16 +242,6 @@ CREATE SEQUENCE public."transactions_transactionId_seq"
 --
 
 ALTER SEQUENCE public."transactions_transactionId_seq" OWNED BY public.transactions."transactionId";
-
-
---
--- Name: userMonth; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public."userMonth" (
-    "userId" integer NOT NULL,
-    "monthId" integer NOT NULL
-);
 
 
 --
@@ -367,19 +320,12 @@ ALTER TABLE ONLY public.users ALTER COLUMN "userId" SET DEFAULT nextval('public.
 -- Data for Name: budgetGroup; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public."budgetGroup" ("groupId", "groupName", "budgetType", "groupOrder", "monthId") FROM stdin;
-1	Giving	expense	1	1
-2	Housing	expense	2	1
-\.
-
-
---
--- Data for Name: budgetGroupItems; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY public."budgetGroupItems" ("budgetGroupId", "budgetItemId") FROM stdin;
-1	1
-1	3
+COPY public."budgetGroup" ("groupId", "groupOrder", "monthId", "groupName", "budgetType") FROM stdin;
+1	1	1	Giving	expense
+2	2	1	Housing	expense
+5	3	1	Untitled	expense
+6	4	1	Untitled	expense
+8	5	1	Untitled	expense
 \.
 
 
@@ -387,27 +333,9 @@ COPY public."budgetGroupItems" ("budgetGroupId", "budgetItemId") FROM stdin;
 -- Data for Name: budgetItems; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public."budgetItems" ("itemId", "itemName", repeat, "itemOrder", planned, spent, "dueDate", "groupIdRef", "monthId") FROM stdin;
-3	Label	false	2	0.00	5.00	\N	1	1
-1	Charity	false	1	0.00	10.00	\N	1	1
-\.
-
-
---
--- Data for Name: itemTransactionSplits; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY public."itemTransactionSplits" ("budgetItemId", "transactionId", "splitId") FROM stdin;
-1	1	1
-\.
-
-
---
--- Data for Name: monthBudgetGroup; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY public."monthBudgetGroup" ("monthId", "budgetGroupId") FROM stdin;
-1	1
+COPY public."budgetItems" ("itemId", "itemName", repeat, "itemOrder", planned, spent, "dueDate", "groupIdRef") FROM stdin;
+3	Label	false	2	0.00	5.00	\N	1
+1	Charity	false	1	0.00	10.00	\N	1
 \.
 
 
@@ -424,9 +352,9 @@ COPY public.months ("monthId", month, year, "userId") FROM stdin;
 -- Data for Name: splits; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.splits ("splitId", "splitAmount", "itemIdRef", "transactionIdRef", "monthId") FROM stdin;
-1	10.00	1	1	1
-3	5.00	3	1	1
+COPY public.splits ("splitId", "splitAmount", "itemIdRef", "transactionIdRef") FROM stdin;
+1	10.00	1	1
+3	5.00	3	1
 \.
 
 
@@ -434,17 +362,8 @@ COPY public.splits ("splitId", "splitAmount", "itemIdRef", "transactionIdRef", "
 -- Data for Name: transactions; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.transactions ("transactionId", "transactionType", "transactionName", deleted, "checkNum", note, "transactionDate", "monthId") FROM stdin;
-1	expense		false	\N	\N	2020-12-02	1
-\.
-
-
---
--- Data for Name: userMonth; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY public."userMonth" ("userId", "monthId") FROM stdin;
-1	1
+COPY public.transactions ("transactionId", "transactionType", "transactionName", deleted, "checkNum", note, "transactionDate") FROM stdin;
+1	expense		false	\N	\N	2020-12-02
 \.
 
 
@@ -461,7 +380,7 @@ COPY public.users ("userId", "userName") FROM stdin;
 -- Name: budgetGroup_budgetGroupId_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."budgetGroup_budgetGroupId_seq"', 2, true);
+SELECT pg_catalog.setval('public."budgetGroup_budgetGroupId_seq"', 8, true);
 
 
 --
@@ -497,6 +416,14 @@ SELECT pg_catalog.setval('public."transactions_transactionId_seq"', 1, true);
 --
 
 SELECT pg_catalog.setval('public."users_userId_seq"', 1, true);
+
+
+--
+-- Name: budgetGroup budgetGroup_groupOrder_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."budgetGroup"
+    ADD CONSTRAINT "budgetGroup_groupOrder_key" UNIQUE ("groupOrder");
 
 
 --

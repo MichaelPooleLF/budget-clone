@@ -1,12 +1,21 @@
 const request = {
   budget: `
-    select *
-      FROM "months"
-      JOIN "budgetGroup"  using ("monthId")
-      JOIN "budgetItems"  using ("monthId")
-      JOIN "transactions" using ("monthId")
-      JOIN "splits"       using ("monthId")
-      WHERE "monthId" = 1
+      select *
+        FROM "months"             AS "m"
+        FULL JOIN "budgetGroup"   AS "g" on "m"."monthId" = "g"."monthId"
+        FULL JOIN "budgetItems"   AS "i" on "g"."groupId" = "i"."groupIdRef"
+        FULL JOIN "splits"        AS "s" on "i"."itemId" = "s"."itemIdRef"
+        FULL JOIN "transactions"  AS "t" on "t"."transactionId" = "s"."transactionIdRef"
+        WHERE "m"."monthId" = 1
+  `,
+  budgetTest: `
+      select *
+      FROM "months"             AS "m"
+      FULL JOIN "budgetGroup"   AS "g" on "m"."monthId" = "g"."monthId"
+      FULL JOIN "budgetItems"   AS "i" on "g"."groupId" = "i"."groupIdRef"
+      FULL JOIN "splits"        AS "s" on "i"."itemId" = "s"."itemIdRef"
+      FULL JOIN "transactions"  AS "t" on "t"."transactionId" = "s"."transactionIdRef"
+      WHERE "m"."monthId" = 1
   `,
   groups: `
     select *
