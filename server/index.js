@@ -31,7 +31,7 @@ app.get('/api/health-check', (req, res, next) => {
 });
 
 app.get('/api/budget', (req, res, next) => {
-  db.query(request.budgetTest)
+  db.query(request.budget)
     .then(data => format.budget(data.rows))
     .then(data => res.status(200).json(data))
     .catch(err => next(err));
