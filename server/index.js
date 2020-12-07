@@ -4,10 +4,20 @@ const db = require('./database');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
-const request = require('./sql-queries');
+const { request, post } = require('./sql-queries');
 const format = require('./format');
 
 const app = express();
+
+function integer(res, value, valueName) {
+  if (!Number.isInteger(Number(value))) {
+    res.status(400).json({
+      error: `${valueName} should be an integer`
+    });
+    return false;
+  }
+  return true;
+}
 
 app.use(staticMiddleware);
 app.use(sessionMiddleware);
@@ -26,6 +36,23 @@ app.get('/api/budget', (req, res, next) => {
     .then(data => res.status(200).json(data))
     .catch(err => next(err));
 });
+
+app.post('/api/groups', (req, res, next) => {
+  const { groupOrder, monthId } = req.body;
+
+  // if (!groupName) groupName = 'Untitled';
+  if (!integer(res, groupOrder, 'groupOrder')) return;
+  if (!integer(res, monthId, 'monthId')) return;
+
+  const params = [groupOrder, monthId];
+  db.query(post.group, params)
+    .then(data => res.status(201).json(data.rows[0]))
+    .catch(err => next(err));
+});
+
+// app.post('/api/items', (req, res, next) => {
+//   let {itemName, repeat, itemOrder, }
+// })
 
 app.use('/api', (req, res, next) => {
   next(new ClientError(`cannot ${req.method} ${req.originalUrl}`, 404));
