@@ -119,7 +119,6 @@ CREATE TABLE public."budgetItems" (
     repeat text DEFAULT 'false'::text NOT NULL,
     "itemOrder" integer NOT NULL,
     planned numeric(14,2) DEFAULT 0.00 NOT NULL,
-    spent numeric(14,2) DEFAULT 0.00 NOT NULL,
     "dueDate" date,
     "groupIdRef" integer NOT NULL
 );
@@ -215,12 +214,12 @@ ALTER SEQUENCE public."splits_splitId_seq" OWNED BY public.splits."splitId";
 
 CREATE TABLE public.transactions (
     "transactionId" integer NOT NULL,
-    "transactionType" text NOT NULL,
-    "transactionName" text NOT NULL,
+    "transactionType" text DEFAULT 'expense'::text NOT NULL,
     deleted text DEFAULT 'false'::text NOT NULL,
     "checkNum" text,
     note text,
-    "transactionDate" date NOT NULL
+    "transactionDate" date NOT NULL,
+    "transactionName" text
 );
 
 
@@ -333,9 +332,9 @@ COPY public."budgetGroup" ("groupId", "groupOrder", "monthId", "groupName", "bud
 -- Data for Name: budgetItems; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public."budgetItems" ("itemId", "itemName", repeat, "itemOrder", planned, spent, "dueDate", "groupIdRef") FROM stdin;
-3	Label	false	2	0.00	5.00	\N	1
-1	Charity	false	1	0.00	10.00	\N	1
+COPY public."budgetItems" ("itemId", "itemName", repeat, "itemOrder", planned, "dueDate", "groupIdRef") FROM stdin;
+3	Label	false	2	0.00	\N	1
+1	Charity	false	1	0.00	\N	1
 \.
 
 
@@ -362,8 +361,8 @@ COPY public.splits ("splitId", "splitAmount", "itemIdRef", "transactionIdRef") F
 -- Data for Name: transactions; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.transactions ("transactionId", "transactionType", "transactionName", deleted, "checkNum", note, "transactionDate") FROM stdin;
-1	expense		false	\N	\N	2020-12-02
+COPY public.transactions ("transactionId", "transactionType", deleted, "checkNum", note, "transactionDate", "transactionName") FROM stdin;
+1	expense	false	\N	\N	2020-12-02	\N
 \.
 
 
