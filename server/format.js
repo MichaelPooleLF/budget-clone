@@ -1,168 +1,126 @@
+
 const format = {
-  budget: function (data) {
+  groups: {},
+  splits: {},
+  transactions: {},
+
+  budget: data => {
+    format.populateGroups(data);
+    const { groups } = format;
     const month = {
-      [data[0].month]: {
-        id: data[0].monthId,
+      [data[0].monthId]: {
+        month: data[0].month,
         year: data[0].year,
-        groups: this.getGroups(data)
+        groups
       }
     };
-
     return month;
   },
 
-  getGroups: function (data) {
-    this.groups = this.uniqueIds(data, 'groupId');
+  populateGroups: data => {
+    data.forEach(dataObj => {
+      const set = format.set(dataObj);
+      const { groupId, itemId, splitId, transactionId } = dataObj;
 
-    this.create('groups').from(data).using('groupId');
-    this.getItems(data);
-    this.addProp('items').to('groups');
+      const groups = format.groups;
+      set.group(groups, groupId);
 
-    return this.groups;
-  },
+      if (itemId) {
+        const groupItems = groups[groupId].items;
+        set.item(groupItems, itemId);
 
-  getItems: function (data) {
-    this.items = this.uniqueIds(data, 'itemId');
+        const splitStore = format.splits;
+        set.splitStore(splitStore, splitId);
 
-    this.create('items').from(data).using('itemId');
-    this.getSplits(data);
-    this.addProp('splits').to('items');
-  },
+        const itemSplits = groupItems[itemId].splits;
+        set.split(itemSplits, splitId);
 
-  getSplits: function (data) {
-    this.splits = this.uniqueIds(data, 'splitId');
+        const transactionStore = format.transactions;
+        set.transactionStore(transactionStore, transactionId, splitId);
 
-    this.create('splits').from(data).using('splitId');
-    this.getTransactions(data);
-    this.addProp('transactions').to('splits');
-  },
-
-  getTransactions: function (data) {
-    this.transactions = this.uniqueIds(data, 'transactionId');
-
-    this.create('transactions').from(data).using('transactionId');
-    this.addProp('splits').to('transactions');
-  },
-
-  addProp: function (propName) {
-    return {
-
-      to: function (parentName) {
-        format[parentName].forEach(parentEl => {
-          format[propName].forEach(propEl => {
-            format.create(propName).on(parentName).using([parentEl, propEl]);
-          });
-        });
+        const splitTransaction = itemSplits[splitId].transaction;
+        set.splitTransaction(splitTransaction, transactionId);
       }
-    };
+    });
   },
 
-  create: function (propName) {
+  set: dataObj => {
     return {
-
-      from: function (data) {
-        return {
-
-          using: function (id) {
-            data.forEach(dataObj => {
-              const index = format[propName].indexOf(dataObj[id]);
-              const inArray = index !== -1;
-              if (inArray) {
-                format.set[propName](index, dataObj);
-              }
-            });
-          }
-        };
+      group: (groups, groupId) => {
+        const { groupName, groupOrder, budgetType } = dataObj;
+        if (!groups[groupId]) {
+          groups[groupId] = {
+            groupName,
+            groupOrder,
+            budgetType,
+            items: {}
+          };
+        }
       },
 
-      on: function (parentName) {
-        return {
+      item: (groupItems, itemId) => {
+        const { groupIdRef, itemName, itemOrder, repeat, planned, dueDate } = dataObj;
+        if (!groupItems[itemId]) {
+          groupItems[itemId] = {
+            groupIdRef,
+            itemName,
+            itemOrder,
+            repeat,
+            planned,
+            dueDate,
+            splits: {}
+          };
+        }
+      },
 
-          using: function (elements) {
-            let [parentEl, propEl] = elements;
-            let idRef = `${parentName}IdRef`;
+      splitStore: (splitStore, splitId) => {
+        const { itemIdRef, transactionIdRef, splitAmount } = dataObj;
+        if (!splitStore[splitId]) {
+          splitStore[splitId] = {
+            itemIdRef,
+            transactionIdRef,
+            splitAmount
+          };
+        }
+      },
 
-            if (parentName === 'splits') {
-              idRef = `${propName}IdRef`;
+      split: (itemSplits, splitId) => {
+        const { itemIdRef, transactionIdRef, splitAmount } = dataObj;
+        if (!itemSplits[splitId]) {
+          itemSplits[splitId] = {
+            itemIdRef,
+            transactionIdRef,
+            splitAmount,
+            transaction: {}
+          };
+        }
+      },
 
-              if (propEl.id === parentEl[idRef]) {
-                parentEl[propName] = propEl;
-              }
-            }
+      transactionStore: (transactionStore, transactionId, splitId) => {
+        const { transactionName, transactionType, transactionDate, checkNum, note, deleted } = dataObj;
 
-            if (parentEl.id === propEl[idRef]) {
-              if (parentName === 'transactions') {
-                const { ...propCopy } = propEl;
-                propEl = propCopy;
-              }
+        if (!transactionStore[transactionId]) {
+          transactionStore[transactionId] = {
+            transactionName,
+            transactionType,
+            transactionDate,
+            checkNum,
+            note,
+            deleted,
+            splits: {}
+          };
+        }
 
-              if (!parentEl[propName]) {
-                parentEl[propName] = [];
-              }
+        transactionStore[transactionId].splits[splitId] = format.splits[splitId];
+      },
 
-              parentEl[propName].push(propEl);
-            }
-          }
-        };
+      splitTransaction: (splitTransaction, transactionId) => {
+        if (!splitTransaction[transactionId]) {
+          splitTransaction[transactionId] = format.transactions[transactionId];
+        }
       }
+
     };
-  },
-
-  uniqueIds: function (data, type) {
-    const idSet = new Set();
-
-    data.forEach(dataObj => {
-      idSet.add(dataObj[type]);
-    });
-
-    const idArr = [...idSet];
-
-    return idArr;
-  },
-
-  set: {
-    groups: function (index, data) {
-      format.groups[index] = {
-        id: data.groupId,
-        name: data.groupName,
-        order: data.groupOrder,
-        type: data.budgetType
-      };
-    },
-
-    items: function (index, data) {
-      format.items[index] = {
-        id: data.itemId,
-        name: data.itemName,
-        order: data.itemOrder,
-        planned: data.planned,
-        spent: data.spent,
-        dueDate: data.dueDate,
-        repeat: data.repeat,
-        groupsIdRef: data.groupIdRef
-      };
-    },
-
-    splits: function (index, data) {
-      format.splits[index] = {
-        id: data.splitId,
-        amount: data.splitAmount,
-        itemsIdRef: data.itemIdRef,
-        transactionsIdRef: data.transactionIdRef
-      };
-    },
-
-    transactions: function (index, data) {
-      format.transactions[index] = {
-        id: data.transactionId,
-        name: data.transactionName,
-        type: data.transactionType,
-        checkNum: data.checkNum,
-        note: data.note,
-        date: data.transactionDate,
-        deleted: data.deleted
-      };
-    }
   }
 };
 

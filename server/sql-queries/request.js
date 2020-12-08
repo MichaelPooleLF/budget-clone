@@ -8,10 +8,6 @@ const request = {
         FULL JOIN "transactions"  AS "t" on "t"."transactionId" = "s"."transactionIdRef"
         WHERE "m"."monthId" = 1
         ORDER BY "groupOrder", "itemOrder"
-  `,
-  groups: `
-    select *
-      from "budgetGroup"
   `
 };
 
