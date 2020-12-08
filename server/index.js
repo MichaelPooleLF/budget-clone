@@ -132,34 +132,10 @@ app.post('/api/transaction', (req, res, next) => {
     .then(data => {
       const { transactionId } = data.rows[0];
       const splitParams = createSplitParams(splits, transactionId);
-      // const counter = 1;
       const splitQuery = createSplitQuery(splits);
-
-      // for (let i = 0; i < splits.length; i++) {
-      //   splitParams.push(transactionId, splits[i].itemIdRef, splits[i].splitAmount);
-      //   let newValueSet = '';
-      //   if (i === splits.length - 1) {
-      //     newValueSet = ` ($${counter++}, $${counter++}, $${counter++}) RETURNING *;`;
-      //   } else {
-      //     newValueSet = ` ($${counter++}, $${counter++}, $${counter++}),`;
-      //   }
-      //   splitQuery += newValueSet;
-      // }
-
-      // console.log(splitQuery, splitParams);
 
       return db.query(splitQuery, splitParams)
         .then(result => res.status(200).json(result.rows));
-
-      //   Promise.all(splits.map(split => {
-      //     const splitParams = [transactionId, split.itemIdRef, split.splitAmount];
-
-    //     return db.query(post.split, splitParams)
-    //       .then(result => result.rows[0]);
-    //   }))
-    //     .then(newSplits => {
-    //       res.status(200).json(newSplits);
-    //     });
     })
     .catch(err => next(err));
 });
