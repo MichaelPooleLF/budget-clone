@@ -9,7 +9,12 @@ const post = {
       VALUES ($1, $2)
       RETURNING *
   `,
-  transaction: ''
+  transaction: `
+    INSERT INTO "transactions" ("transactionName", "transactionDate", "checkNum", "note")
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+  `,
+  split: 'INSERT INTO "splits" ("transactionIdRef", "itemIdRef", "splitAmount") Values'
 };
 
 module.exports = post;
