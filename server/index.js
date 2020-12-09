@@ -4,7 +4,7 @@ const db = require('./database');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
-const { request, post } = require('./sql-queries');
+const { get, post } = require('./sql-queries');
 const { check, create } = require('./utility-functions');
 const format = require('./format');
 
@@ -15,14 +15,16 @@ app.use(sessionMiddleware);
 
 app.use(express.json());
 
+// used to check if server can connect to database
 app.get('/api/health-check', (req, res, next) => {
   db.query('select \'successfully connected\' as "message"')
     .then(result => res.json(result.rows[0]))
     .catch(err => next(err));
 });
 
-app.get('/api/budget', (req, res, next) => {
-  db.query(request.budget)
+// retrieves budget based on monthId
+app.get('/api/month/:monthId', (req, res, next) => {
+  db.query(get.month, [req.params.monthId])
     .then(data => format.budget(data.rows))
     .then(data => res.status(200).json(data))
     .catch(err => next(err));
