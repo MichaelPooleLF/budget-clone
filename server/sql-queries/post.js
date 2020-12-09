@@ -1,7 +1,7 @@
 const post = {
   group: `
-    INSERT INTO "budgetGroup" ("groupOrder", "monthId")
-      VALUES ($1, $2)
+    INSERT INTO "budgetGroup" ("groupOrder", "monthId", "groupName", "budgetType")
+      VALUES ($1, $2, $3, $4)
       RETURNING *
   `,
   item: `
@@ -10,8 +10,8 @@ const post = {
       RETURNING *
   `,
   transaction: `
-    INSERT INTO "transactions" ("transactionName", "transactionDate", "checkNum", "note")
-      VALUES ($1, $2, $3, $4)
+    INSERT INTO "transactions" ("transactionName", "transactionDate", "transactionType", "checkNum", "note")
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *
   `,
   split: 'INSERT INTO "splits" ("transactionIdRef", "itemIdRef", "splitAmount") Values'

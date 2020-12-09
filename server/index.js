@@ -4,99 +4,51 @@ const db = require('./database');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
-const { request, post } = require('./sql-queries');
+const { get, post } = require('./sql-queries');
+const { check, create } = require('./utility-functions');
 const format = require('./format');
 
 const app = express();
-
-function invalidInt(res, value, valueName, i) {
-  const index = (i === 0 || i) ? ` at index ${i}` : '';
-
-  if (!Number.isInteger(Number(value))) {
-    res.status(400).json({
-      error: `${valueName} should be an integer${index}. Instead, ${valueName} equals "${value}"`
-    });
-    return true;
-  }
-  return false;
-}
-
-function invalidDate(res, date) {
-  if (!Date.parse(date)) {
-    res.status(400).json({
-      error: `${date} is not a valid date. Valid date format should follow YYYY-MM-DD`
-    });
-    return true;
-  }
-  return false;
-}
-
-function invalidFloat(res, value, valueName, i) {
-  const index = (i === 0 || i) ? `at index ${i}` : '';
-  const cents = value.split('.')[1];
-  const isNumber = Number(value);
-
-  if (!isNumber || !cents || cents.length !== 2) {
-    res.status(400).json({
-      error: `${valueName} '${value}' is not a valid decimal number${index}.  Valid inputs should be greater than zero and formatted as price (ex: '1.00')`
-    });
-    return true;
-  }
-
-  return false;
-}
-
-function createSplitQuery(arr) {
-  let counter = 1;
-  let query = post.split;
-
-  for (let i = 0; i < arr.length; i++) {
-    let newValueSet = '';
-
-    if (i === arr.length - 1) {
-      newValueSet = ` ($${counter++}, $${counter++}, $${counter++}) RETURNING *;`;
-    } else {
-      newValueSet = ` ($${counter++}, $${counter++}, $${counter++}),`;
-    }
-    query += newValueSet;
-  }
-
-  return query;
-}
-
-function createSplitParams(arr, transactionId) {
-  const params = [];
-
-  arr.forEach(split => {
-    params.push(transactionId, split.itemIdRef, split.splitAmount);
-  });
-
-  return params;
-}
 
 app.use(staticMiddleware);
 app.use(sessionMiddleware);
 
 app.use(express.json());
 
+// used to check if server can connect to database
 app.get('/api/health-check', (req, res, next) => {
   db.query('select \'successfully connected\' as "message"')
     .then(result => res.json(result.rows[0]))
     .catch(err => next(err));
 });
 
-app.get('/api/budget', (req, res, next) => {
-  db.query(request.budget)
-    .then(data => format.budget(data.rows))
-    .then(data => res.status(200).json(data))
-    .catch(err => next(err));
+// retrieves monthly budget based on monthId
+app.get('/api/month/:monthId', (req, res, next) => {
+  const { monthId } = req.params;
+  if (check.validInt(res, monthId, 'monthId')) {
+    db.query(get.month, [monthId])
+      .then(data => {
+        if (check.idExists(res, data, monthId, 'month')) {
+          return format.budget(data.rows);
+        }
+      })
+      .then(data => res.status(200).json(data))
+      .catch(err => next(err));
+  }
+
 });
 
+/*
+* adds new budgetGroup to a month
+* only checks for groupOrder and monthId because groups are created on click with
+* default values. user then edits values in update.
+*/
 app.post('/api/group', (req, res, next) => {
   const { groupOrder, monthId } = req.body;
 
-  if (invalidInt(res, groupOrder, 'groupOrder')) return;
-  if (invalidInt(res, monthId, 'monthId')) return;
+  // checks for invalid entries in request body
+  if (check.invalidInt(res, groupOrder, 'groupOrder')) return;
+  if (check.invalidInt(res, monthId, 'monthId')) return;
 
   const params = [groupOrder, monthId];
   db.query(post.group, params)
@@ -104,11 +56,17 @@ app.post('/api/group', (req, res, next) => {
     .catch(err => next(err));
 });
 
+/*
+* adds new budgetItem to a group
+* only checks for itemOrder and monthId because items are created on click with
+* default values. user then edits values in update.
+*/
 app.post('/api/item', (req, res, next) => {
   const { itemOrder, groupIdRef } = req.body;
 
-  if (invalidInt(res, itemOrder, 'itemOrder')) return;
-  if (invalidInt(res, groupIdRef, 'groupIdRef')) return;
+  // checks for invalid entries in request body
+  if (check.invalidInt(res, itemOrder, 'itemOrder')) return;
+  if (check.invalidInt(res, groupIdRef, 'groupIdRef')) return;
 
   const params = [itemOrder, groupIdRef];
   db.query(post.item, params)
@@ -116,23 +74,30 @@ app.post('/api/item', (req, res, next) => {
     .catch(err => next(err));
 });
 
+/*
+* creates a transaction and new splits
+* splits retrived from array of splits in request body
+*/
 app.post('/api/transaction', (req, res, next) => {
-  const { transactionName, transactionDate, checkNum, note } = req.body;
+  let { transactionName, transactionDate, transactionType, checkNum, note } = req.body;
   const { splits } = req.body;
 
-  if (invalidDate(res, transactionDate)) return;
+  // checks for invalid entries in request body
+  if (check.invalidDate(res, transactionDate)) return;
   for (let i = 0; i < splits.length; i++) {
-    if (invalidInt(res, splits[i].itemIdRef, 'itemIdRef', i)) return;
-    if (invalidFloat(res, splits[i].splitAmount, 'splitAmount', i)) return;
+    if (check.invalidInt(res, splits[i].itemIdRef, 'itemIdRef', i)) return;
+    if (check.invalidFloat(res, splits[i].splitAmount, 'splitAmount', i)) return;
   }
+  if (!transactionType) transactionType = 'expense';
 
-  const transParams = [transactionName, transactionDate, checkNum, note];
+  const transParams = [transactionName, transactionDate, transactionType, checkNum, note];
 
+  // adds transaction, then generates insert query based on number of splits
   db.query(post.transaction, transParams)
     .then(data => {
       const { transactionId } = data.rows[0];
-      const splitParams = createSplitParams(splits, transactionId);
-      const splitQuery = createSplitQuery(splits);
+      const splitParams = create.splitParams(splits, transactionId);
+      const splitQuery = create.splitQuery(splits);
 
       return db.query(splitQuery, splitParams)
         .then(result => res.status(200).json(result.rows));
@@ -140,6 +105,7 @@ app.post('/api/transaction', (req, res, next) => {
     .catch(err => next(err));
 });
 
+//
 app.use('/api', (req, res, next) => {
   next(new ClientError(`cannot ${req.method} ${req.originalUrl}`, 404));
 });

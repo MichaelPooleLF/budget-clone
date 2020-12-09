@@ -1,7 +1,7 @@
-const request = require('./request');
+const get = require('./get');
 const post = require('./post');
 
 module.exports = {
-  request: { ...request },
+  get: { ...get },
   post: { ...post }
 };
