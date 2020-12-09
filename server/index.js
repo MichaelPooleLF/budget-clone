@@ -5,7 +5,7 @@ const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
 const { request, post } = require('./sql-queries');
-const { check } = require('./utility-functions');
+const { check, create } = require('./utility-functions');
 const format = require('./format');
 
 const app = express();
@@ -47,33 +47,33 @@ const app = express();
 //   return false;
 // }
 
-function createSplitQuery(arr) {
-  let counter = 1;
-  let query = post.split;
+// function createSplitQuery(arr) {
+//   let counter = 1;
+//   let query = post.split;
 
-  for (let i = 0; i < arr.length; i++) {
-    let newValueSet = '';
+//   for (let i = 0; i < arr.length; i++) {
+//     let newValueSet = '';
 
-    if (i === arr.length - 1) {
-      newValueSet = ` ($${counter++}, $${counter++}, $${counter++}) RETURNING *;`;
-    } else {
-      newValueSet = ` ($${counter++}, $${counter++}, $${counter++}),`;
-    }
-    query += newValueSet;
-  }
+//     if (i === arr.length - 1) {
+//       newValueSet = ` ($${counter++}, $${counter++}, $${counter++}) RETURNING *;`;
+//     } else {
+//       newValueSet = ` ($${counter++}, $${counter++}, $${counter++}),`;
+//     }
+//     query += newValueSet;
+//   }
 
-  return query;
-}
+//   return query;
+// }
 
-function createSplitParams(arr, transactionId) {
-  const params = [];
+// function createSplitParams(arr, transactionId) {
+//   const params = [];
 
-  arr.forEach(split => {
-    params.push(transactionId, split.itemIdRef, split.splitAmount);
-  });
+//   arr.forEach(split => {
+//     params.push(transactionId, split.itemIdRef, split.splitAmount);
+//   });
 
-  return params;
-}
+//   return params;
+// }
 
 app.use(staticMiddleware);
 app.use(sessionMiddleware);
@@ -137,8 +137,8 @@ app.post('/api/transaction', (req, res, next) => {
   db.query(post.transaction, transParams)
     .then(data => {
       const { transactionId } = data.rows[0];
-      const splitParams = createSplitParams(splits, transactionId);
-      const splitQuery = createSplitQuery(splits);
+      const splitParams = create.splitParams(splits, transactionId);
+      const splitQuery = create.splitQuery(splits);
 
       return db.query(splitQuery, splitParams)
         .then(result => res.status(200).json(result.rows));

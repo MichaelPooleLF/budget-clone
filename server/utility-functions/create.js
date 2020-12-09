@@ -1,7 +1,7 @@
 const post = require('../sql-queries/post');
 
 const create = {
-  createSplitQuery: arr => {
+  splitQuery: arr => {
     let counter = 1;
     let query = post.split;
 
@@ -19,7 +19,7 @@ const create = {
     return query;
   },
 
-  createSplitParams: (arr, transactionId) => {
+  splitParams: (arr, transactionId) => {
     const params = [];
 
     arr.forEach(split => {
