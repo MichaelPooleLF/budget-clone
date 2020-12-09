@@ -5,6 +5,7 @@ const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
 const { request, post } = require('./sql-queries');
+const { check } = require('./utility-functions');
 const format = require('./format');
 
 const app = express();
@@ -95,8 +96,8 @@ app.get('/api/budget', (req, res, next) => {
 app.post('/api/group', (req, res, next) => {
   const { groupOrder, monthId } = req.body;
 
-  if (invalidInt(res, groupOrder, 'groupOrder')) return;
-  if (invalidInt(res, monthId, 'monthId')) return;
+  if (check.invalidInt(res, groupOrder, 'groupOrder')) return;
+  if (check.invalidInt(res, monthId, 'monthId')) return;
 
   const params = [groupOrder, monthId];
   db.query(post.group, params)
