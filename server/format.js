@@ -1,8 +1,8 @@
 
 const format = {
   groups: {},
-  splits: {},
-  transactions: {},
+  splitStore: {},
+  transactionStore: {},
 
   budget: data => {
     format.populateGroups(data);
@@ -21,30 +21,27 @@ const format = {
     data.forEach(dataObj => {
       const set = format.set(dataObj);
       const { groupId, itemId, splitId, transactionId } = dataObj;
+      const { groups, splitStore, transactionStore } = format;
 
-      const groups = format.groups;
       set.group(groups, groupId);
 
       if (itemId) {
         const groupItems = groups[groupId].items;
         set.item(groupItems, itemId);
 
-        const splitStore = format.splits;
-        set.splitStore(splitStore, splitId);
-
         const itemSplits = groupItems[itemId].splits;
+        set.splitStore(splitStore, splitId);
         set.split(itemSplits, splitId);
 
-        const transactionStore = format.transactions;
-        set.transactionStore(transactionStore, transactionId, splitId);
-
         const splitTransaction = itemSplits[splitId].transaction;
+        set.transactionStore(transactionStore, transactionId, splitId);
         set.splitTransaction(splitTransaction, transactionId);
       }
     });
   },
 
   set: dataObj => {
+
     return {
       group: (groups, groupId) => {
         const { groupName, groupOrder, budgetType } = dataObj;
@@ -111,12 +108,12 @@ const format = {
           };
         }
 
-        transactionStore[transactionId].splits[splitId] = format.splits[splitId];
+        transactionStore[transactionId].splits[splitId] = format.splitStore[splitId];
       },
 
       splitTransaction: (splitTransaction, transactionId) => {
         if (!splitTransaction[transactionId]) {
-          splitTransaction[transactionId] = format.transactions[transactionId];
+          splitTransaction[transactionId] = format.transactionStore[transactionId];
         }
       }
 
