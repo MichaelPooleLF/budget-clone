@@ -37,6 +37,19 @@ const check = {
     }
 
     return false;
+  },
+
+  idExists: (res, result, value, valueName) => {
+    const id = Number(value);
+
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        error: `${valueName} at id=${id} does not exist. Please try a different id.`
+      });
+      return false;
+    }
+
+    return true;
   }
 };
 

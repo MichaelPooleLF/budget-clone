@@ -7,6 +7,7 @@ const sessionMiddleware = require('./session-middleware');
 const { get, post } = require('./sql-queries');
 const { check, create } = require('./utility-functions');
 const format = require('./format');
+// const { idDoesNotExist } = require('./utility-functions/check');
 
 const app = express();
 
@@ -22,19 +23,30 @@ app.get('/api/health-check', (req, res, next) => {
     .catch(err => next(err));
 });
 
-// retrieves budget based on monthId
+// retrieves monthly budget based on monthId
 app.get('/api/month/:monthId', (req, res, next) => {
-  db.query(get.month, [req.params.monthId])
-    .then(data => format.budget(data.rows))
+  const { monthId } = req.params;
+  if (check.invalidInt(res, monthId, 'monthId')) return;
+
+  db.query(get.month, [monthId])
+    .then(data => {
+      if (check.idExists(res, data, monthId, 'month')) {
+        return format.budget(data.rows);
+      }
+    })
     .then(data => res.status(200).json(data))
     .catch(err => next(err));
 });
 
-// only check for groupOrder and monthId because groups are created on click with
-// default values. user then edits values in update.
+/*
+* adds new budgetGroup to a month
+* only checks for groupOrder and monthId because groups are created on click with
+* default values. user then edits values in update.
+*/
 app.post('/api/group', (req, res, next) => {
   const { groupOrder, monthId } = req.body;
 
+  // checks for invalid entries in request body
   if (check.invalidInt(res, groupOrder, 'groupOrder')) return;
   if (check.invalidInt(res, monthId, 'monthId')) return;
 
@@ -44,11 +56,15 @@ app.post('/api/group', (req, res, next) => {
     .catch(err => next(err));
 });
 
-// only check for itemOrder and monthId because items are created on click with
-// default values. user then edits values in update.
+/*
+* adds new budgetItem to a group
+* only checks for itemOrder and monthId because items are created on click with
+* default values. user then edits values in update.
+*/
 app.post('/api/item', (req, res, next) => {
   const { itemOrder, groupIdRef } = req.body;
 
+  // checks for invalid entries in request body
   if (check.invalidInt(res, itemOrder, 'itemOrder')) return;
   if (check.invalidInt(res, groupIdRef, 'groupIdRef')) return;
 
@@ -58,10 +74,15 @@ app.post('/api/item', (req, res, next) => {
     .catch(err => next(err));
 });
 
+/*
+* creates a transaction and new splits
+* splits retrived from array of splits in request body
+*/
 app.post('/api/transaction', (req, res, next) => {
   let { transactionName, transactionDate, transactionType, checkNum, note } = req.body;
   const { splits } = req.body;
 
+  // checks for invalid entries in request body
   if (check.invalidDate(res, transactionDate)) return;
   for (let i = 0; i < splits.length; i++) {
     if (check.invalidInt(res, splits[i].itemIdRef, 'itemIdRef', i)) return;
@@ -71,6 +92,7 @@ app.post('/api/transaction', (req, res, next) => {
 
   const transParams = [transactionName, transactionDate, transactionType, checkNum, note];
 
+  // adds transaction, then generates insert query based on number of splits
   db.query(post.transaction, transParams)
     .then(data => {
       const { transactionId } = data.rows[0];
@@ -83,6 +105,7 @@ app.post('/api/transaction', (req, res, next) => {
     .catch(err => next(err));
 });
 
+//
 app.use('/api', (req, res, next) => {
   next(new ClientError(`cannot ${req.method} ${req.originalUrl}`, 404));
 });
