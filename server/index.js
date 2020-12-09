@@ -10,42 +10,42 @@ const format = require('./format');
 
 const app = express();
 
-function invalidInt(res, value, valueName, i) {
-  const index = (i === 0 || i) ? ` at index ${i}` : '';
+// function invalidInt(res, value, valueName, i) {
+//   const index = (i === 0 || i) ? ` at index ${i}` : '';
 
-  if (!Number.isInteger(Number(value))) {
-    res.status(400).json({
-      error: `${valueName} should be an integer${index}. Instead, ${valueName} equals "${value}"`
-    });
-    return true;
-  }
-  return false;
-}
+//   if (!Number.isInteger(Number(value))) {
+//     res.status(400).json({
+//       error: `${valueName} should be an integer${index}. Instead, ${valueName} equals "${value}"`
+//     });
+//     return true;
+//   }
+//   return false;
+// }
 
-function invalidDate(res, date) {
-  if (!Date.parse(date)) {
-    res.status(400).json({
-      error: `${date} is not a valid date. Valid date format should follow YYYY-MM-DD`
-    });
-    return true;
-  }
-  return false;
-}
+// function invalidDate(res, date) {
+//   if (!Date.parse(date)) {
+//     res.status(400).json({
+//       error: `${date} is not a valid date. Valid date format should follow YYYY-MM-DD`
+//     });
+//     return true;
+//   }
+//   return false;
+// }
 
-function invalidFloat(res, value, valueName, i) {
-  const index = (i === 0 || i) ? `at index ${i}` : '';
-  const cents = value.split('.')[1];
-  const isNumber = Number(value);
+// function invalidFloat(res, value, valueName, i) {
+//   const index = (i === 0 || i) ? `at index ${i}` : '';
+//   const cents = value.split('.')[1];
+//   const isNumber = Number(value);
 
-  if (!isNumber || !cents || cents.length !== 2) {
-    res.status(400).json({
-      error: `${valueName} '${value}' is not a valid decimal number${index}.  Valid inputs should be greater than zero and formatted as price (ex: '1.00')`
-    });
-    return true;
-  }
+//   if (!isNumber || !cents || cents.length !== 2) {
+//     res.status(400).json({
+//       error: `${valueName} '${value}' is not a valid decimal number${index}.  Valid inputs should be greater than zero and formatted as price (ex: '1.00')`
+//     });
+//     return true;
+//   }
 
-  return false;
-}
+//   return false;
+// }
 
 function createSplitQuery(arr) {
   let counter = 1;
@@ -93,6 +93,8 @@ app.get('/api/budget', (req, res, next) => {
     .catch(err => next(err));
 });
 
+// only check for groupOrder and monthId because groups are created on click with
+// default values. user then edits values in update.
 app.post('/api/group', (req, res, next) => {
   const { groupOrder, monthId } = req.body;
 
@@ -105,11 +107,13 @@ app.post('/api/group', (req, res, next) => {
     .catch(err => next(err));
 });
 
+// only check for itemOrder and monthId because items are created on click with
+// default values. user then edits values in update.
 app.post('/api/item', (req, res, next) => {
   const { itemOrder, groupIdRef } = req.body;
 
-  if (invalidInt(res, itemOrder, 'itemOrder')) return;
-  if (invalidInt(res, groupIdRef, 'groupIdRef')) return;
+  if (check.invalidInt(res, itemOrder, 'itemOrder')) return;
+  if (check.invalidInt(res, groupIdRef, 'groupIdRef')) return;
 
   const params = [itemOrder, groupIdRef];
   db.query(post.item, params)
@@ -118,16 +122,17 @@ app.post('/api/item', (req, res, next) => {
 });
 
 app.post('/api/transaction', (req, res, next) => {
-  const { transactionName, transactionDate, checkNum, note } = req.body;
+  let { transactionName, transactionDate, transactionType, checkNum, note } = req.body;
   const { splits } = req.body;
 
-  if (invalidDate(res, transactionDate)) return;
+  if (check.invalidDate(res, transactionDate)) return;
   for (let i = 0; i < splits.length; i++) {
-    if (invalidInt(res, splits[i].itemIdRef, 'itemIdRef', i)) return;
-    if (invalidFloat(res, splits[i].splitAmount, 'splitAmount', i)) return;
+    if (check.invalidInt(res, splits[i].itemIdRef, 'itemIdRef', i)) return;
+    if (check.invalidFloat(res, splits[i].splitAmount, 'splitAmount', i)) return;
   }
+  if (!transactionType) transactionType = 'expense';
 
-  const transParams = [transactionName, transactionDate, checkNum, note];
+  const transParams = [transactionName, transactionDate, transactionType, checkNum, note];
 
   db.query(post.transaction, transParams)
     .then(data => {

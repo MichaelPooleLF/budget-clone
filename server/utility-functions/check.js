@@ -1,10 +1,11 @@
 const check = {
   invalidInt: (res, value, valueName, i) => {
     const index = (i === 0 || i) ? ` at index ${i}` : '';
+    const num = Number(value);
 
-    if (!Number.isInteger(Number(value))) {
+    if (!Number.isInteger(num) || num === 0) {
       res.status(400).json({
-        error: `${valueName} should be an integer${index}. Instead, ${valueName} equals "${value}"`
+        error: `${valueName} should be an positive non-zero integer${index}. Instead, ${valueName} equals "${value}"`
       });
 
       return true;
@@ -24,7 +25,7 @@ const check = {
   },
 
   invalidFloat: (res, value, valueName, i) => {
-    const index = (i === 0 || i) ? `at index ${i}` : '';
+    const index = (i === 0 || i) ? ` at index ${i}` : '';
     const cents = value.split('.')[1];
     const isNumber = Number(value);
 
