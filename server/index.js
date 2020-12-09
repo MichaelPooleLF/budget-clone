@@ -7,7 +7,6 @@ const sessionMiddleware = require('./session-middleware');
 const { get, post } = require('./sql-queries');
 const { check, create } = require('./utility-functions');
 const format = require('./format');
-// const { idDoesNotExist } = require('./utility-functions/check');
 
 const app = express();
 
@@ -26,16 +25,17 @@ app.get('/api/health-check', (req, res, next) => {
 // retrieves monthly budget based on monthId
 app.get('/api/month/:monthId', (req, res, next) => {
   const { monthId } = req.params;
-  if (check.invalidInt(res, monthId, 'monthId')) return;
+  if (check.validInt(res, monthId, 'monthId')) {
+    db.query(get.month, [monthId])
+      .then(data => {
+        if (check.idExists(res, data, monthId, 'month')) {
+          return format.budget(data.rows);
+        }
+      })
+      .then(data => res.status(200).json(data))
+      .catch(err => next(err));
+  }
 
-  db.query(get.month, [monthId])
-    .then(data => {
-      if (check.idExists(res, data, monthId, 'month')) {
-        return format.budget(data.rows);
-      }
-    })
-    .then(data => res.status(200).json(data))
-    .catch(err => next(err));
 });
 
 /*

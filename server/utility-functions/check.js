@@ -1,4 +1,19 @@
 const check = {
+  validInt: (res, value, valueName, i) => {
+    const index = (i === 0 || i) ? ` at index ${i}` : '';
+    const num = Number(value);
+
+    if (!Number.isInteger(num) || num === 0) {
+      res.status(400).json({
+        error: `${valueName} should be an positive non-zero integer${index}. Instead, ${valueName} equals "${value}"`
+      });
+
+      return false;
+    }
+
+    return true;
+  },
+
   invalidInt: (res, value, valueName, i) => {
     const index = (i === 0 || i) ? ` at index ${i}` : '';
     const num = Number(value);
