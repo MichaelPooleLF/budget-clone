@@ -4,16 +4,24 @@ const db = require('./database');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
+const validateMonth = require('./validation-middleware');
 const { get, post } = require('./sql-queries');
 const { check, create } = require('./utility-functions');
 const format = require('./format');
 
 const app = express();
 
+/*
+* TOP LEVEL MIDDLEWARE
+*/
+
 app.use(staticMiddleware);
 app.use(sessionMiddleware);
-
 app.use(express.json());
+
+/*
+* GET METHODS
+*/
 
 // used to check if server can connect to database
 app.get('/api/health-check', (req, res, next) => {
@@ -23,20 +31,23 @@ app.get('/api/health-check', (req, res, next) => {
 });
 
 // retrieves monthly budget based on monthId
-app.get('/api/month/:monthId', (req, res, next) => {
+app.get('/api/month/:monthId', validateMonth, (req, res, next) => {
   const { monthId } = req.params;
-  if (check.validInt(res, monthId, 'monthId')) {
-    db.query(get.month, [monthId])
-      .then(data => {
-        if (check.idExists(res, data, monthId, 'month')) {
-          return format.budget(data.rows);
-        }
-      })
-      .then(data => res.status(200).json(data))
-      .catch(err => next(err));
-  }
-
+  db.query(get.month, [monthId])
+    .then(data => {
+      if (!data.rows[0]) {
+        const message = `monthId at ${monthId} does not exist. Please try a different id`;
+        throw new ClientError(message, 404);
+      }
+      return format.budget(data.rows);
+    })
+    .then(data => res.status(200).json(data))
+    .catch(err => next(err));
 });
+
+/*
+* POST METHODS
+/*
 
 /*
 * adds new budgetGroup to a month
@@ -74,10 +85,7 @@ app.post('/api/item', (req, res, next) => {
     .catch(err => next(err));
 });
 
-/*
-* creates a transaction and new splits
-* splits retrived from array of splits in request body
-*/
+// creates a transaction and new splits. splits retrived from array of splits in request body
 app.post('/api/transaction', (req, res, next) => {
   let { transactionName, transactionDate, transactionType, checkNum, note } = req.body;
   const { splits } = req.body;
@@ -105,11 +113,16 @@ app.post('/api/transaction', (req, res, next) => {
     .catch(err => next(err));
 });
 
-//
+/*
+* ERROR HANDLERS
+*/
+
+// handles unhandled requests on paths with root "/api"
 app.use('/api', (req, res, next) => {
   next(new ClientError(`cannot ${req.method} ${req.originalUrl}`, 404));
 });
 
+// versitile error handling middleware
 app.use((err, req, res, next) => {
   if (err instanceof ClientError) {
     res.status(err.status).json({

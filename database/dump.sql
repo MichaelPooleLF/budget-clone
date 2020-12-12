@@ -322,9 +322,6 @@ ALTER TABLE ONLY public.users ALTER COLUMN "userId" SET DEFAULT nextval('public.
 COPY public."budgetGroup" ("groupId", "groupOrder", "monthId", "groupName", "budgetType") FROM stdin;
 1	1	1	Giving	expense
 2	2	1	Housing	expense
-5	3	1	Untitled	expense
-6	4	1	Untitled	expense
-8	5	1	Untitled	expense
 \.
 
 

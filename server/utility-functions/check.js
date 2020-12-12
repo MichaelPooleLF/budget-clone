@@ -1,4 +1,17 @@
+const ClientError = require('../client-error');
+
 const check = {
+  validMonth: (data, next) => {
+    const num = Number(data.val);
+
+    if (!Number.isInteger(num) || num <= 0) {
+      const message = `${data.val} is not a positive non-zero integer at ${data.name}`;
+      throw new ClientError(message, 400);
+    }
+
+    next();
+  },
+
   validInt: (res, value, valueName, i) => {
     const index = (i === 0 || i) ? ` at index ${i}` : '';
     const num = Number(value);
@@ -69,3 +82,12 @@ const check = {
 };
 
 module.exports = check;
+
+// const num = Number(data.val);
+
+// if (!Number.isInteger(num) || num <= 0) {
+//   const message = `${}`
+//   throw new ClientError()
+// }
+
+// return true;
