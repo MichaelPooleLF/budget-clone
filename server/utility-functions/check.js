@@ -8,13 +8,22 @@ const check = {
     }
   },
 
+  int: value => {
+    const num = Number(value);
+
+    if (!Number.isInteger(num) || num <= 0) {
+      const message = `${value} is not a positive non-zero integer.`;
+      throw new ClientError(message, 400);
+    }
+  },
+
   validInt: (res, value, valueName, i) => {
     const index = (i === 0 || i) ? ` at index ${i}` : '';
     const num = Number(value);
 
     if (!Number.isInteger(num) || num === 0) {
       res.status(400).json({
-        error: `${valueName} should be an positive non-zero integer${index}. Instead, ${valueName} equals "${value}"`
+        error: `${valueName} should be a positive non-zero integer${index}. Instead, ${valueName} equals "${value}"`
       });
 
       return false;

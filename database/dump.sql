@@ -23,7 +23,6 @@ ALTER TABLE IF EXISTS ONLY public.months DROP CONSTRAINT IF EXISTS months_pkey;
 ALTER TABLE IF EXISTS ONLY public."budgetItems" DROP CONSTRAINT IF EXISTS "budgetItems_pkey";
 ALTER TABLE IF EXISTS ONLY public."budgetItems" DROP CONSTRAINT IF EXISTS "budgetItems_order_key";
 ALTER TABLE IF EXISTS ONLY public."budgetGroup" DROP CONSTRAINT IF EXISTS "budgetGroup_pkey";
-ALTER TABLE IF EXISTS ONLY public."budgetGroup" DROP CONSTRAINT IF EXISTS "budgetGroup_groupOrder_key";
 ALTER TABLE IF EXISTS public.users ALTER COLUMN "userId" DROP DEFAULT;
 ALTER TABLE IF EXISTS public.transactions ALTER COLUMN "transactionId" DROP DEFAULT;
 ALTER TABLE IF EXISTS public.splits ALTER COLUMN "splitId" DROP DEFAULT;
@@ -376,7 +375,7 @@ COPY public.users ("userId", "userName") FROM stdin;
 -- Name: budgetGroup_budgetGroupId_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."budgetGroup_budgetGroupId_seq"', 8, true);
+SELECT pg_catalog.setval('public."budgetGroup_budgetGroupId_seq"', 11, true);
 
 
 --
@@ -412,14 +411,6 @@ SELECT pg_catalog.setval('public."transactions_transactionId_seq"', 1, true);
 --
 
 SELECT pg_catalog.setval('public."users_userId_seq"', 1, true);
-
-
---
--- Name: budgetGroup budgetGroup_groupOrder_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public."budgetGroup"
-    ADD CONSTRAINT "budgetGroup_groupOrder_key" UNIQUE ("groupOrder");
 
 
 --

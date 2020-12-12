@@ -1,5 +1,5 @@
-// const check = require('./utility-functions/check');
 const ClientError = require('./client-error');
+const { check } = require('./utility-functions');
 
 const validateMonth = (req, res, next) => {
   const { monthId } = req.params;
@@ -13,4 +13,20 @@ const validateMonth = (req, res, next) => {
   next();
 };
 
-module.exports = validateMonth;
+const validInt = method => {
+
+  return (req, res, next) => {
+    const { groupOrder, monthId } = req.body;
+
+    switch (method) {
+      case 'group':
+        check.int(groupOrder);
+        check.int(monthId);
+        break;
+    }
+
+    next();
+  };
+};
+
+module.exports = { validateMonth, validInt };
