@@ -4,16 +4,23 @@ const db = require('./database');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
-const { get, post } = require('./sql-queries');
+const { post } = require('./sql-queries');
 const { check, create } = require('./utility-functions');
-const format = require('./format');
+const { getMonth, postGroup } = require('./routes');
 
 const app = express();
 
+/*
+* TOP LEVEL MIDDLEWARE
+*/
+
 app.use(staticMiddleware);
 app.use(sessionMiddleware);
-
 app.use(express.json());
+
+/*
+* GET METHODS
+*/
 
 // used to check if server can connect to database
 app.get('/api/health-check', (req, res, next) => {
@@ -22,39 +29,13 @@ app.get('/api/health-check', (req, res, next) => {
     .catch(err => next(err));
 });
 
-// retrieves monthly budget based on monthId
-app.get('/api/month/:monthId', (req, res, next) => {
-  const { monthId } = req.params;
-  if (check.validInt(res, monthId, 'monthId')) {
-    db.query(get.month, [monthId])
-      .then(data => {
-        if (check.idExists(res, data, monthId, 'month')) {
-          return format.budget(data.rows);
-        }
-      })
-      .then(data => res.status(200).json(data))
-      .catch(err => next(err));
-  }
-
-});
+getMonth(app);
 
 /*
-* adds new budgetGroup to a month
-* only checks for groupOrder and monthId because groups are created on click with
-* default values. user then edits values in update.
+* POST METHODS
 */
-app.post('/api/group', (req, res, next) => {
-  const { groupOrder, monthId } = req.body;
 
-  // checks for invalid entries in request body
-  if (check.invalidInt(res, groupOrder, 'groupOrder')) return;
-  if (check.invalidInt(res, monthId, 'monthId')) return;
-
-  const params = [groupOrder, monthId];
-  db.query(post.group, params)
-    .then(data => res.status(201).json(data.rows[0]))
-    .catch(err => next(err));
-});
+postGroup(app);
 
 /*
 * adds new budgetItem to a group
@@ -74,10 +55,7 @@ app.post('/api/item', (req, res, next) => {
     .catch(err => next(err));
 });
 
-/*
-* creates a transaction and new splits
-* splits retrived from array of splits in request body
-*/
+// creates a transaction and new splits. splits retrived from array of splits in request body
 app.post('/api/transaction', (req, res, next) => {
   let { transactionName, transactionDate, transactionType, checkNum, note } = req.body;
   const { splits } = req.body;
@@ -105,11 +83,16 @@ app.post('/api/transaction', (req, res, next) => {
     .catch(err => next(err));
 });
 
-//
+/*
+* ERROR HANDLERS
+*/
+
+// handles unhandled requests on paths with root "/api"
 app.use('/api', (req, res, next) => {
   next(new ClientError(`cannot ${req.method} ${req.originalUrl}`, 404));
 });
 
+// versitile error handling middleware
 app.use((err, req, res, next) => {
   if (err instanceof ClientError) {
     res.status(err.status).json({

@@ -1,11 +1,29 @@
+const ClientError = require('../client-error');
+
 const check = {
+  id: data => {
+    if (!data.rows[0]) {
+      const message = 'That id does not exist. Please try a different id';
+      throw new ClientError(message, 404);
+    }
+  },
+
+  int: value => {
+    const num = Number(value);
+
+    if (!Number.isInteger(num) || num <= 0) {
+      const message = `${value} is not a positive non-zero integer.`;
+      throw new ClientError(message, 400);
+    }
+  },
+
   validInt: (res, value, valueName, i) => {
     const index = (i === 0 || i) ? ` at index ${i}` : '';
     const num = Number(value);
 
     if (!Number.isInteger(num) || num === 0) {
       res.status(400).json({
-        error: `${valueName} should be an positive non-zero integer${index}. Instead, ${valueName} equals "${value}"`
+        error: `${valueName} should be a positive non-zero integer${index}. Instead, ${valueName} equals "${value}"`
       });
 
       return false;
@@ -55,11 +73,11 @@ const check = {
   },
 
   idExists: (res, result, value, valueName) => {
-    const id = Number(value);
+    // const id = Number(value);
 
-    if (result.rows.length === 0) {
+    if (!result.rows[0]) {
       res.status(404).json({
-        error: `${valueName} at id=${id} does not exist. Please try a different id.`
+        error: `${valueName} at id=${value} does not exist. Please try a different id.`
       });
       return false;
     }
@@ -69,3 +87,12 @@ const check = {
 };
 
 module.exports = check;
+
+// const num = Number(data.val);
+
+// if (!Number.isInteger(num) || num <= 0) {
+//   const message = `${}`
+//   throw new ClientError()
+// }
+
+// return true;
