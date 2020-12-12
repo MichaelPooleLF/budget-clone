@@ -4,10 +4,11 @@ const db = require('./database');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
-const validateMonth = require('./validation-middleware');
-const { get, post } = require('./sql-queries');
+// const validateMonth = require('./validation-middleware');
+const { post } = require('./sql-queries');
 const { check, create } = require('./utility-functions');
-const format = require('./format');
+// const format = require('./format');
+const { getMonth } = require('./routes');
 
 const app = express();
 
@@ -30,20 +31,7 @@ app.get('/api/health-check', (req, res, next) => {
     .catch(err => next(err));
 });
 
-// retrieves monthly budget based on monthId
-app.get('/api/month/:monthId', validateMonth, (req, res, next) => {
-  const { monthId } = req.params;
-  db.query(get.month, [monthId])
-    .then(data => {
-      if (!data.rows[0]) {
-        const message = `monthId at ${monthId} does not exist. Please try a different id`;
-        throw new ClientError(message, 404);
-      }
-      return format.budget(data.rows);
-    })
-    .then(data => res.status(200).json(data))
-    .catch(err => next(err));
-});
+getMonth(app);
 
 /*
 * POST METHODS

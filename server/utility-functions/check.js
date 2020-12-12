@@ -1,15 +1,11 @@
 const ClientError = require('../client-error');
 
 const check = {
-  validMonth: (data, next) => {
-    const num = Number(data.val);
-
-    if (!Number.isInteger(num) || num <= 0) {
-      const message = `${data.val} is not a positive non-zero integer at ${data.name}`;
-      throw new ClientError(message, 400);
+  id: data => {
+    if (!data.rows[0]) {
+      const message = 'That id does not exist. Please try a different id';
+      throw new ClientError(message, 404);
     }
-
-    next();
   },
 
   validInt: (res, value, valueName, i) => {
@@ -68,11 +64,11 @@ const check = {
   },
 
   idExists: (res, result, value, valueName) => {
-    const id = Number(value);
+    // const id = Number(value);
 
-    if (result.rows.length === 0) {
+    if (!result.rows[0]) {
       res.status(404).json({
-        error: `${valueName} at id=${id} does not exist. Please try a different id.`
+        error: `${valueName} at id=${value} does not exist. Please try a different id.`
       });
       return false;
     }
