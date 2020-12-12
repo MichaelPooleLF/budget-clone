@@ -1,7 +1,7 @@
 const post = {
   group: `
-    INSERT INTO "budgetGroup" ("groupOrder", "monthId", "groupName", "budgetType")
-      VALUES ($1, $2, $3, $4)
+    INSERT INTO "budgetGroup" ("groupOrder", "monthId")
+      VALUES ($1, $2)
       RETURNING *
   `,
   item: `

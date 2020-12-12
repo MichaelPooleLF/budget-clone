@@ -4,11 +4,9 @@ const db = require('./database');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
-// const validateMonth = require('./validation-middleware');
 const { post } = require('./sql-queries');
 const { check, create } = require('./utility-functions');
-// const format = require('./format');
-const { getMonth } = require('./routes');
+const { getMonth, postGroup } = require('./routes');
 
 const app = express();
 
@@ -42,18 +40,19 @@ getMonth(app);
 * only checks for groupOrder and monthId because groups are created on click with
 * default values. user then edits values in update.
 */
-app.post('/api/group', (req, res, next) => {
-  const { groupOrder, monthId } = req.body;
+postGroup(app);
+// app.post('/api/group', (req, res, next) => {
+//   const { groupOrder, monthId } = req.body;
 
-  // checks for invalid entries in request body
-  if (check.invalidInt(res, groupOrder, 'groupOrder')) return;
-  if (check.invalidInt(res, monthId, 'monthId')) return;
+//   // checks for invalid entries in request body
+//   if (check.invalidInt(res, groupOrder, 'groupOrder')) return;
+//   if (check.invalidInt(res, monthId, 'monthId')) return;
 
-  const params = [groupOrder, monthId];
-  db.query(post.group, params)
-    .then(data => res.status(201).json(data.rows[0]))
-    .catch(err => next(err));
-});
+//   const params = [groupOrder, monthId];
+//   db.query(post.group, params)
+//     .then(data => res.status(201).json(data.rows[0]))
+//     .catch(err => next(err));
+// });
 
 /*
 * adds new budgetItem to a group

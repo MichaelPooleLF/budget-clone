@@ -1,5 +1,4 @@
-const getMonth = require('./getMonth');
+const getMonth = require('./get-month');
+const postGroup = require('./post-group');
 
-// console.log(test);
-
-module.exports = { getMonth };
+module.exports = { getMonth, postGroup };
