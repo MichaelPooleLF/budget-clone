@@ -32,7 +32,7 @@ const validateInt = method => {
       case 'transaction':
         for (let i = 0; i < splits.length; i++) {
           check.int(splits[i].itemIdRef);
-          check.int(splits[i].splitAmount);
+          check.float(splits[i].splitAmount);
         }
         break;
     }
@@ -45,7 +45,7 @@ const validTransactionDate = (req, res, next) => {
   const { transactionDate } = req.body;
 
   if (!Date.parse(transactionDate)) {
-    const message = `${transactionDate} is not a valid date. Valid date format should follow YYYY-MM-DD (from "date")`;
+    const message = `${transactionDate} is not a valid date. Valid date format should follow YYYY-MM-DD`;
     throw new ClientError(message, 400);
   }
 

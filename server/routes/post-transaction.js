@@ -12,12 +12,6 @@ const postTransaction = app => {
       let { transactionName, transactionDate, transactionType, checkNum, note } = req.body;
       const { splits } = req.body;
 
-      // checks for invalid entries in request body
-      // if (check.invalidDate(res, transactionDate)) return;
-      // for (let i = 0; i < splits.length; i++) {
-      //   if (check.invalidInt(res, splits[i].itemIdRef, 'itemIdRef', i)) return;
-      //   if (check.invalidFloat(res, splits[i].splitAmount, 'splitAmount', i)) return;
-      // }
       if (!transactionType) transactionType = 'expense';
 
       const transParams = [transactionName, transactionDate, transactionType, checkNum, note];

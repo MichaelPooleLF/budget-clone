@@ -19,6 +19,16 @@ const check = {
     }
   },
 
+  float: value => {
+    const cents = value.split('.')[1];
+    const isNumber = Number(value);
+
+    if (!isNumber || !cents || !cents.length !== 2) {
+      const message = `${value} is not a valid decimal number. Valid inputs should be greater than zero and formatted as price (ex: '1.00')`;
+      throw new ClientError(message, 400);
+    }
+  },
+
   validInt: (res, value, valueName, i) => {
     const index = (i === 0 || i) ? ` at index ${i}` : '';
     const num = Number(value);
