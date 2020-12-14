@@ -18,6 +18,7 @@ const validateInt = method => {
   return (req, res, next) => {
     const { groupOrder, monthId } = req.body;
     const { itemOrder, groupIdRef } = req.body;
+    const { splits } = req.body;
 
     switch (method) {
       case 'group':
@@ -27,6 +28,12 @@ const validateInt = method => {
       case 'item':
         check.int(itemOrder);
         check.int(groupIdRef);
+        break;
+      case 'transaction':
+        for (let i = 0; i < splits.length; i++) {
+          check.int(splits[i].itemIdRef);
+          check.int(splits[i].splitAmount);
+        }
         break;
     }
 
