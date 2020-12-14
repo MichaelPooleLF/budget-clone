@@ -1,6 +1,7 @@
 const ClientError = require('../client-error');
 
 const check = {
+  // checks that the searched id exists in database
   id: data => {
     if (!data.rows[0]) {
       const message = 'That id does not exist. Please try a different id';
@@ -8,6 +9,7 @@ const check = {
     }
   },
 
+  // checks that the value passed in is a valid integer
   int: value => {
     const num = Number(value);
 
