@@ -1,26 +1,18 @@
-const ClientError = require('./client-error');
-const { check } = require('./utility-functions');
+const ClientError = require('../client-error');
+const { check } = require('../utility-functions');
 
-const validateMonth = (req, res, next) => {
-  const { monthId } = req.params;
-  const num = Number(monthId);
-
-  if (!Number.isInteger(num) || num <= 0) {
-    const message = `${monthId} is not a positive non-zero integer at monthId`;
-    throw new ClientError(message, 400);
-  }
-
-  next();
-};
-
-const validateInt = method => {
+const validInt = method => {
 
   return (req, res, next) => {
+    const monthIdParam = req.params.monthId;
     const { groupOrder, monthId } = req.body;
     const { itemOrder, groupIdRef } = req.body;
     const { splits } = req.body;
 
     switch (method) {
+      case 'month':
+        check.int(monthIdParam);
+        break;
       case 'group':
         check.int(groupOrder);
         check.int(monthId);
@@ -41,7 +33,7 @@ const validateInt = method => {
   };
 };
 
-const validTransactionDate = (req, res, next) => {
+const validDate = (req, res, next) => {
   const { transactionDate } = req.body;
 
   if (!Date.parse(transactionDate)) {
@@ -52,4 +44,5 @@ const validTransactionDate = (req, res, next) => {
   next();
 };
 
-module.exports = { validateMonth, validateInt, validTransactionDate };
+// module.exports = { validMonth, validInt, validDate };
+module.exports = { validInt, validDate };
