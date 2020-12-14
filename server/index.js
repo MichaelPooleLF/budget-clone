@@ -4,8 +4,6 @@ const db = require('./database');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
-// const { post } = require('./sql-queries');
-// const { check, create } = require('./utility-functions');
 const { getMonth, postGroup, postItem, postTransaction } = require('./routes');
 
 const app = express();
@@ -38,34 +36,6 @@ getMonth(app);
 postGroup(app);
 postItem(app);
 postTransaction(app);
-
-// creates a transaction and new splits. splits retrived from array of splits in request body
-// app.post('/api/transaction', (req, res, next) => {
-//   let { transactionName, transactionDate, transactionType, checkNum, note } = req.body;
-//   const { splits } = req.body;
-
-//   // checks for invalid entries in request body
-//   if (check.invalidDate(res, transactionDate)) return;
-//   for (let i = 0; i < splits.length; i++) {
-//     if (check.invalidInt(res, splits[i].itemIdRef, 'itemIdRef', i)) return;
-//     if (check.invalidFloat(res, splits[i].splitAmount, 'splitAmount', i)) return;
-//   }
-//   if (!transactionType) transactionType = 'expense';
-
-//   const transParams = [transactionName, transactionDate, transactionType, checkNum, note];
-
-//   // adds transaction, then generates insert query based on number of splits
-//   db.query(post.transaction, transParams)
-//     .then(data => {
-//       const { transactionId } = data.rows[0];
-//       const splitParams = create.splitParams(splits, transactionId);
-//       const splitQuery = create.splitQuery(splits);
-
-//       return db.query(splitQuery, splitParams)
-//         .then(result => res.status(200).json(result.rows));
-//     })
-//     .catch(err => next(err));
-// });
 
 /*
 * ERROR HANDLERS
