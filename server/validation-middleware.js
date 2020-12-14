@@ -13,15 +13,20 @@ const validateMonth = (req, res, next) => {
   next();
 };
 
-const validInt = method => {
+const validateInt = method => {
 
   return (req, res, next) => {
     const { groupOrder, monthId } = req.body;
+    const { itemOrder, groupIdRef } = req.body;
 
     switch (method) {
       case 'group':
         check.int(groupOrder);
         check.int(monthId);
+        break;
+      case 'item':
+        check.int(itemOrder);
+        check.int(groupIdRef);
         break;
     }
 
@@ -29,4 +34,4 @@ const validInt = method => {
   };
 };
 
-module.exports = { validateMonth, validInt };
+module.exports = { validateMonth, validateInt };
