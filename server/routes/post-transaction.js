@@ -1,15 +1,16 @@
 const db = require('../database');
 const { check, create } = require('../utility-functions');
 const { post } = require('../sql-queries');
+const { validTransactionDate } = require('../validation-middleware');
 
 // creates a transaction and new splits. splits retrived from array of splits in request body
 const postTransaction = app => {
-  app.post('/api/transaction', (req, res, next) => {
+  app.post('/api/transaction', validTransactionDate, (req, res, next) => {
     let { transactionName, transactionDate, transactionType, checkNum, note } = req.body;
     const { splits } = req.body;
 
     // checks for invalid entries in request body
-    if (check.invalidDate(res, transactionDate)) return;
+    // if (check.invalidDate(res, transactionDate)) return;
     for (let i = 0; i < splits.length; i++) {
       if (check.invalidInt(res, splits[i].itemIdRef, 'itemIdRef', i)) return;
       if (check.invalidFloat(res, splits[i].splitAmount, 'splitAmount', i)) return;

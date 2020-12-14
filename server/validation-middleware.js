@@ -34,4 +34,15 @@ const validateInt = method => {
   };
 };
 
-module.exports = { validateMonth, validateInt };
+const validTransactionDate = (req, res, next) => {
+  const { transactionDate } = req.body;
+
+  if (!Date.parse(transactionDate)) {
+    const message = `${transactionDate} is not a valid date. Valid date format should follow YYYY-MM-DD (from "date")`;
+    throw new ClientError(message, 400);
+  }
+
+  next();
+};
+
+module.exports = { validateMonth, validateInt, validTransactionDate };
