@@ -1,64 +1,31 @@
 require('dotenv/config');
 const express = require('express');
-const { db, ClientError } = require('./variables');
-const { staticMiddleware, sessionMiddleware } = require('./middleware');
+const staticMiddleware = require('./static-middleware');
+const sessionMiddleware = require('./session-middleware');
+const { handlePathError, sendError } = require('./middleware');
 const { get, post } = require('./routes');
 
 const app = express();
 
-/*
-* TOP LEVEL MIDDLEWARE
-*/
+// TOP LEVEL MIDDLEWARE
+app.use(staticMiddleware); // serves static files in the public path
+app.use(sessionMiddleware); // stores session data in session file
+app.use(express.json()); // parses request bodies as JSON
 
-app.use(staticMiddleware);
-app.use(sessionMiddleware);
-app.use(express.json());
+// GET METHODS
+get.healthCheck(app); // check if server can connect to database
+get.month(app); // retrieve budget by monthId
 
-/*
-* GET METHODS
-*/
+// POST METHODS
+post.group(app); // add a new group
+post.item(app); // add a new group item
+post.transaction(app); // add a new transaction
 
-// used to check if server can connect to database
-app.get('/api/health-check', (req, res, next) => {
-  db.query('select \'successfully connected\' as "message"')
-    .then(result => res.json(result.rows[0]))
-    .catch(err => next(err));
-});
+// ERROR HANDLERS
+handlePathError(app); // handles unhandled requests on paths with root "/api"
+sendError(app); // versitile error handling middleware
 
-get.month(app);
-
-/*
-* POST METHODS
-*/
-
-post.group(app);
-post.item(app);
-post.transaction(app);
-
-/*
-* ERROR HANDLERS
-*/
-
-// handles unhandled requests on paths with root "/api"
-app.use('/api', (req, res, next) => {
-  next(new ClientError(`cannot ${req.method} ${req.originalUrl}`, 404));
-});
-
-// versitile error handling middleware
-app.use((err, req, res, next) => {
-  if (err instanceof ClientError) {
-    res.status(err.status).json({
-      error: err.message
-    });
-  } else {
-    console.error(err);
-    res.status(500).json({
-      error: 'an unexpected error occurred'
-    });
-  }
-});
-
-// start server
+// START SERVER
 app.listen(process.env.PORT, () => {
   // eslint-disable-next-line no-console
   console.log('Listening on port', process.env.PORT);
