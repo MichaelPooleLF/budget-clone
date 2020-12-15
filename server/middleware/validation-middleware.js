@@ -1,38 +1,37 @@
-const { ClientError } = require('../variables');
 const { check } = require('../utility-functions');
 
-const validInt = method => {
+const validate = method => {
 
   return (req, res, next) => {
     const monthIdParam = req.params.monthId;
     const { groupOrder, monthId } = req.body;
     const { itemOrder, groupIdRef } = req.body;
-    const { splits } = req.body;
+    const { transactionDate, splits } = req.body;
 
     switch (method) {
       case 'month':
-        check.isValue({ name: 'monthIdParam', value: monthIdParam });
         check.int(monthIdParam);
         break;
       case 'group':
-        check.isValue({
-          name: 'groupOrder',
-          value: groupOrder
-        },
-        {
-          name: 'monthId',
-          value: monthId
-        });
+        check.contains(groupOrder, 'groupOrder');
         check.int(groupOrder);
+        check.contains(monthId, 'monthId');
         check.int(monthId);
         break;
       case 'item':
+        check.contains(itemOrder, 'itemOrder');
         check.int(itemOrder);
+        check.contains(groupIdRef, 'groupIdRef');
         check.int(groupIdRef);
         break;
       case 'transaction':
+        check.contains(transactionDate, 'transactionDate');
+        check.date(transactionDate);
+        check.contains(splits, 'splits');
         for (let i = 0; i < splits.length; i++) {
+          check.contains(splits[i].itemIdRef, `splits[${i}].itemIdRef`);
           check.int(splits[i].itemIdRef);
+          check.contains(splits[i].splitAmount, `splits[${i}].splitAmount`);
           check.float(splits[i].splitAmount);
         }
         break;
@@ -41,17 +40,4 @@ const validInt = method => {
     next();
   };
 };
-
-const validDate = (req, res, next) => {
-  const { transactionDate } = req.body;
-
-  if (!Date.parse(transactionDate)) {
-    const message = `${transactionDate} is not a valid date. Valid date format should follow YYYY-MM-DD`;
-    throw new ClientError(message, 400);
-  }
-
-  next();
-};
-
-// module.exports = { validMonth, validInt, validDate };
-module.exports = { validInt, validDate };
+module.exports = validate;

@@ -1,6 +1,6 @@
 const { db } = require('../variables');
 const { post } = require('../sql-queries');
-const { validationMiddleware: { validInt } } = require('../middleware');
+const { validate } = require('../middleware');
 
 /*
 * adds new budgetItem to a group
@@ -8,7 +8,7 @@ const { validationMiddleware: { validInt } } = require('../middleware');
 * default values. user then edits values in update.
 */
 const postItem = app => {
-  app.post('/api/item', validInt('item'), (req, res, next) => {
+  app.post('/api/item', validate('item'), (req, res, next) => {
     const { itemOrder, groupIdRef } = req.body;
     const params = [itemOrder, groupIdRef];
 

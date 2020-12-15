@@ -30,13 +30,18 @@ const check = {
     }
   },
 
-  isValue: (...Args) => {
-    Args.forEach(argument => {
-      if (!argument.value) {
-        const message = `${argument.name} is not defined in the request`;
-        throw new ClientError(message, 400);
-      }
-    });
+  contains: (value, property) => {
+    if (!value) {
+      const message = `${property} is not defined in the body.`;
+      throw new ClientError(message, 400);
+    }
+  },
+
+  date: date => {
+    if (!Date.parse(date)) {
+      const message = `${date} is not a valid date. Valid date format should follow YYYY-MM-DD`;
+      throw new ClientError(message, 400);
+    }
   }
 };
 
