@@ -11,9 +11,18 @@ const validInt = method => {
 
     switch (method) {
       case 'month':
+        check.isValue({ name: 'monthIdParam', value: monthIdParam });
         check.int(monthIdParam);
         break;
       case 'group':
+        check.isValue({
+          name: 'groupOrder',
+          value: groupOrder
+        },
+        {
+          name: 'monthId',
+          value: monthId
+        });
         check.int(groupOrder);
         check.int(monthId);
         break;

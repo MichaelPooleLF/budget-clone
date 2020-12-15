@@ -28,6 +28,15 @@ const check = {
       const message = `${value} is not a valid decimal number. Valid inputs should be greater than zero and formatted as price (ex: '1.00')`;
       throw new ClientError(message, 400);
     }
+  },
+
+  isValue: (...Args) => {
+    Args.forEach(argument => {
+      if (!argument.value) {
+        const message = `${argument.name} is not defined in the request`;
+        throw new ClientError(message, 400);
+      }
+    });
   }
 };
 
