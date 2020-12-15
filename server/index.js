@@ -11,41 +11,31 @@ const app = express();
 * TOP LEVEL MIDDLEWARE
 */
 
-app.use(staticMiddleware);
-app.use(sessionMiddleware);
-app.use(express.json());
+app.use(staticMiddleware); // serves static files in the public path
+app.use(sessionMiddleware); // stores session data in session file
+app.use(express.json()); // parses request bodies as JSON
 
 /*
 * GET METHODS
 */
 
-// used to check if server can connect to database
-get.healthCheck(app);
-// app.get('/api/health-check', (req, res, next) => {
-//   db.query('select \'successfully connected\' as "message"')
-//     .then(result => res.json(result.rows[0]))
-//     .catch(err => next(err));
-// });
-
-get.month(app);
+get.healthCheck(app); // check if server can connect to database
+get.month(app); // retrieve budget by monthId
 
 /*
 * POST METHODS
 */
 
-post.group(app);
-post.item(app);
-post.transaction(app);
+post.group(app); // add a new group
+post.item(app); // add a new group item
+post.transaction(app); // add a new transaction
 
 /*
 * ERROR HANDLERS
 */
 
-// handles unhandled requests on paths with root "/api"
-handlePathError(app);
-
-// versitile error handling middleware
-sendError(app);
+handlePathError(app); // handles unhandled requests on paths with root "/api"
+sendError(app); // versitile error handling middleware
 
 // start server
 app.listen(process.env.PORT, () => {
