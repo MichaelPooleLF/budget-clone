@@ -2,7 +2,8 @@ require('dotenv/config');
 const express = require('express');
 const { db, ClientError } = require('./variables');
 const { staticMiddleware, sessionMiddleware } = require('./middleware');
-const { getMonth, postGroup, postItem, postTransaction } = require('./routes');
+// const { getMonth, postGroup, postItem, postTransaction } = require('./routes');
+const { get, post } = require('./routes');
 
 const app = express();
 
@@ -25,15 +26,15 @@ app.get('/api/health-check', (req, res, next) => {
     .catch(err => next(err));
 });
 
-getMonth(app);
+get.month(app);
 
 /*
 * POST METHODS
 */
 
-postGroup(app);
-postItem(app);
-postTransaction(app);
+post.group(app);
+post.item(app);
+post.transaction(app);
 
 /*
 * ERROR HANDLERS
