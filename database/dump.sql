@@ -21,7 +21,6 @@ ALTER TABLE IF EXISTS ONLY public.transactions DROP CONSTRAINT IF EXISTS transac
 ALTER TABLE IF EXISTS ONLY public.splits DROP CONSTRAINT IF EXISTS splits_pkey;
 ALTER TABLE IF EXISTS ONLY public.months DROP CONSTRAINT IF EXISTS months_pkey;
 ALTER TABLE IF EXISTS ONLY public."budgetItems" DROP CONSTRAINT IF EXISTS "budgetItems_pkey";
-ALTER TABLE IF EXISTS ONLY public."budgetItems" DROP CONSTRAINT IF EXISTS "budgetItems_order_key";
 ALTER TABLE IF EXISTS ONLY public."budgetGroup" DROP CONSTRAINT IF EXISTS "budgetGroup_pkey";
 ALTER TABLE IF EXISTS public.users ALTER COLUMN "userId" DROP DEFAULT;
 ALTER TABLE IF EXISTS public.transactions ALTER COLUMN "transactionId" DROP DEFAULT;
@@ -331,6 +330,7 @@ COPY public."budgetGroup" ("groupId", "groupOrder", "monthId", "groupName", "bud
 COPY public."budgetItems" ("itemId", "itemName", repeat, "itemOrder", planned, "dueDate", "groupIdRef") FROM stdin;
 3	Label	false	2	0.00	\N	1
 1	Charity	false	1	0.00	\N	1
+4	Label	false	3	0.00	\N	1
 \.
 
 
@@ -350,6 +350,7 @@ COPY public.months ("monthId", month, year, "userId") FROM stdin;
 COPY public.splits ("splitId", "splitAmount", "itemIdRef", "transactionIdRef") FROM stdin;
 1	10.00	1	1
 3	5.00	3	1
+4	3.00	4	2
 \.
 
 
@@ -359,6 +360,7 @@ COPY public.splits ("splitId", "splitAmount", "itemIdRef", "transactionIdRef") F
 
 COPY public.transactions ("transactionId", "transactionType", deleted, "checkNum", note, "transactionDate", "transactionName") FROM stdin;
 1	expense	false	\N	\N	2020-12-02	\N
+2	expense	false	\N	\N	2020-12-14	\N
 \.
 
 
@@ -382,7 +384,7 @@ SELECT pg_catalog.setval('public."budgetGroup_budgetGroupId_seq"', 11, true);
 -- Name: budgetItems_budgetItemId_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."budgetItems_budgetItemId_seq"', 3, true);
+SELECT pg_catalog.setval('public."budgetItems_budgetItemId_seq"', 4, true);
 
 
 --
@@ -396,14 +398,14 @@ SELECT pg_catalog.setval('public."months_monthId_seq"', 1, true);
 -- Name: splits_splitId_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."splits_splitId_seq"', 3, true);
+SELECT pg_catalog.setval('public."splits_splitId_seq"', 4, true);
 
 
 --
 -- Name: transactions_transactionId_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."transactions_transactionId_seq"', 1, true);
+SELECT pg_catalog.setval('public."transactions_transactionId_seq"', 2, true);
 
 
 --
@@ -419,14 +421,6 @@ SELECT pg_catalog.setval('public."users_userId_seq"', 1, true);
 
 ALTER TABLE ONLY public."budgetGroup"
     ADD CONSTRAINT "budgetGroup_pkey" PRIMARY KEY ("groupId");
-
-
---
--- Name: budgetItems budgetItems_order_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public."budgetItems"
-    ADD CONSTRAINT "budgetItems_order_key" UNIQUE ("itemOrder");
 
 
 --

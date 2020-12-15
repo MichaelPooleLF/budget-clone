@@ -1,6 +1,6 @@
-const db = require('../database');
+const { db } = require('../variables');
 const { post } = require('../sql-queries');
-const { validInt } = require('../validation-middleware');
+const { validate } = require('../middleware');
 
 /*
 * adds new budgetGroup to a month
@@ -8,7 +8,7 @@ const { validInt } = require('../validation-middleware');
 * default values. user then edits values in update.
 */
 const postGroup = app => {
-  app.post('/api/group', validInt('group'), (req, res, next) => {
+  app.post('/api/group', validate('group'), (req, res, next) => {
     const { groupOrder, monthId } = req.body;
     const params = [groupOrder, monthId];
 
