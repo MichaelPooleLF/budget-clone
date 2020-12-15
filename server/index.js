@@ -3,6 +3,7 @@ const express = require('express');
 const { db, ClientError } = require('./variables');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
+const { handlePathError } = require('./middleware');
 const { get, post } = require('./routes');
 
 const app = express();
@@ -41,9 +42,10 @@ post.transaction(app);
 */
 
 // handles unhandled requests on paths with root "/api"
-app.use('/api', (req, res, next) => {
-  next(new ClientError(`cannot ${req.method} ${req.originalUrl}`, 404));
-});
+handlePathError(app);
+// app.use('/api', (req, res, next) => {
+//   next(new ClientError(`cannot ${req.method} ${req.originalUrl}`, 404));
+// });
 
 // versitile error handling middleware
 app.use((err, req, res, next) => {
