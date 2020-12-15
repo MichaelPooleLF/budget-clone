@@ -1,7 +1,6 @@
-const db = require('../database');
-const format = require('../format');
+const { db } = require('../variables');
 const { get } = require('../sql-queries');
-const { check } = require('../utility-functions');
+const { check, format } = require('../utility-functions');
 const { validationMiddleware } = require('../middleware');
 const { validInt } = validationMiddleware;
 

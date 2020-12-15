@@ -1,4 +1,4 @@
-const post = require('../sql-queries/post');
+const { post } = require('../sql-queries');
 
 const create = {
   splitQuery: arr => {

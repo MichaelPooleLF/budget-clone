@@ -1,4 +1,4 @@
-const ClientError = require('../client-error');
+const { ClientError } = require('../variables');
 
 const check = {
   // checks that the searched id exists in database

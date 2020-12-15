@@ -1,7 +1,6 @@
 require('dotenv/config');
 const express = require('express');
-const db = require('./database');
-const ClientError = require('./client-error');
+const { db, ClientError } = require('./variables');
 const { staticMiddleware, sessionMiddleware } = require('./middleware');
 const { getMonth, postGroup, postItem, postTransaction } = require('./routes');
 

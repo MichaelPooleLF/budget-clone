@@ -1,4 +1,4 @@
-const ClientError = require('../client-error');
+const { ClientError } = require('../variables');
 const { check } = require('../utility-functions');
 
 const validInt = method => {

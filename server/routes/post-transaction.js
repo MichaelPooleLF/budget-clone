@@ -1,4 +1,4 @@
-const db = require('../database');
+const { db } = require('../variables');
 const { create } = require('../utility-functions');
 const { post } = require('../sql-queries');
 const { validationMiddleware } = require('../middleware');
