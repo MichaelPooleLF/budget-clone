@@ -1,6 +1,5 @@
 require('dotenv/config');
 const express = require('express');
-const { db } = require('./variables');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
 const { handlePathError, sendError } = require('./middleware');
@@ -21,11 +20,12 @@ app.use(express.json());
 */
 
 // used to check if server can connect to database
-app.get('/api/health-check', (req, res, next) => {
-  db.query('select \'successfully connected\' as "message"')
-    .then(result => res.json(result.rows[0]))
-    .catch(err => next(err));
-});
+get.healthCheck(app);
+// app.get('/api/health-check', (req, res, next) => {
+//   db.query('select \'successfully connected\' as "message"')
+//     .then(result => res.json(result.rows[0]))
+//     .catch(err => next(err));
+// });
 
 get.month(app);
 
@@ -43,24 +43,9 @@ post.transaction(app);
 
 // handles unhandled requests on paths with root "/api"
 handlePathError(app);
-// app.use('/api', (req, res, next) => {
-//   next(new ClientError(`cannot ${req.method} ${req.originalUrl}`, 404));
-// });
 
 // versitile error handling middleware
 sendError(app);
-// app.use((err, req, res, next) => {
-//   if (err instanceof ClientError) {
-//     res.status(err.status).json({
-//       error: err.message
-//     });
-//   } else {
-//     console.error(err);
-//     res.status(500).json({
-//       error: 'an unexpected error occurred'
-//     });
-//   }
-// });
 
 // start server
 app.listen(process.env.PORT, () => {
