@@ -1,8 +1,7 @@
 const { db } = require('../variables');
 const { get } = require('../sql-queries');
 const { check, format } = require('../utility-functions');
-const { validationMiddleware } = require('../middleware');
-const { validInt } = validationMiddleware;
+const { validationMiddleware: { validInt } } = require('../middleware');
 
 // retrieves monthly budget based on monthId
 const getMonth = app => {

@@ -1,8 +1,7 @@
 const { db } = require('../variables');
 const { create } = require('../utility-functions');
 const { post } = require('../sql-queries');
-const { validationMiddleware } = require('../middleware');
-const { validDate, validInt } = validationMiddleware;
+const { validationMiddleware: { validDate, validInt } } = require('../middleware');
 
 // creates a transaction and new splits. splits retrived from array of splits in request body
 const postTransaction = app => {
