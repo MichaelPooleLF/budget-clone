@@ -1,6 +1,6 @@
 const getMonth = require('./get-month');
 const postGroup = require('./post-group');
-const postItem = require('./post-items');
+const postItem = require('./post-item');
 const postTransaction = require('./post-transaction');
 
 module.exports = {
