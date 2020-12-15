@@ -24,7 +24,7 @@ const check = {
     const cents = value.split('.')[1];
     const isNumber = Number(value);
 
-    if (!isNumber || !cents || !cents.length !== 2) {
+    if (!isNumber || !cents || cents.length !== 2) {
       const message = `${value} is not a valid decimal number. Valid inputs should be greater than zero and formatted as price (ex: '1.00')`;
       throw new ClientError(message, 400);
     }
