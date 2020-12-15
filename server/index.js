@@ -1,9 +1,9 @@
 require('dotenv/config');
 const express = require('express');
-const { db, ClientError } = require('./variables');
+const { db } = require('./variables');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
-const { handlePathError } = require('./middleware');
+const { handlePathError, sendError } = require('./middleware');
 const { get, post } = require('./routes');
 
 const app = express();
@@ -48,18 +48,19 @@ handlePathError(app);
 // });
 
 // versitile error handling middleware
-app.use((err, req, res, next) => {
-  if (err instanceof ClientError) {
-    res.status(err.status).json({
-      error: err.message
-    });
-  } else {
-    console.error(err);
-    res.status(500).json({
-      error: 'an unexpected error occurred'
-    });
-  }
-});
+sendError(app);
+// app.use((err, req, res, next) => {
+//   if (err instanceof ClientError) {
+//     res.status(err.status).json({
+//       error: err.message
+//     });
+//   } else {
+//     console.error(err);
+//     res.status(500).json({
+//       error: 'an unexpected error occurred'
+//     });
+//   }
+// });
 
 // start server
 app.listen(process.env.PORT, () => {
