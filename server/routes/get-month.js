@@ -1,11 +1,11 @@
 const { db } = require('../variables');
 const { get } = require('../sql-queries');
 const { check, format } = require('../utility-functions');
-const { validate } = require('../middleware');
+const { validateMonth } = require('../middleware');
 
 // retrieves monthly budget based on monthId
 const getMonth = app => {
-  app.get('/api/month/:monthId', validate('month'), (req, res, next) => {
+  app.get('/api/month/:monthId', validateMonth, (req, res, next) => {
     const { monthId } = req.params;
     db.query(get.month, [monthId])
       .then(data => {

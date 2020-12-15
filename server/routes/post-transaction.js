@@ -1,11 +1,11 @@
 const { db } = require('../variables');
 const { create } = require('../utility-functions');
 const { post } = require('../sql-queries');
-const { validate } = require('../middleware');
+const { validateTransaction } = require('../middleware');
 
 // creates a transaction and new splits. splits retrived from array of splits in request body
 const postTransaction = app => {
-  app.post('/api/transaction', validate('transaction'), (req, res, next) => {
+  app.post('/api/transaction', validateTransaction, (req, res, next) => {
     let { transactionName, transactionDate, transactionType, checkNum, note } = req.body;
     const { splits } = req.body;
 
