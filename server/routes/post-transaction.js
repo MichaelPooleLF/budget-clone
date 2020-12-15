@@ -6,8 +6,8 @@ const { validateTransaction } = require('../middleware');
 // creates a transaction and new splits. splits retrived from array of splits in request body
 const postTransaction = app => {
   app.post('/api/transaction', validateTransaction, (req, res, next) => {
-    let { transactionName, transactionDate, transactionType, checkNum, note } = req.body;
-    const { splits } = req.body;
+    const { transactionName, transactionDate, checkNum, note, splits } = req.body;
+    let { transactionType } = req.body;
 
     if (!transactionType) transactionType = 'expense';
 
