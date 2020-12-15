@@ -5,7 +5,7 @@ const { validInt } = validationMiddleware;
 
 /*
 * adds new budgetItem to a group
-* only checks for itemOrder and monthId because items are created on click with
+* only checks for itemOrder and groupIdRef because items are created on click with
 * default values. user then edits values in update.
 */
 const postItem = app => {
