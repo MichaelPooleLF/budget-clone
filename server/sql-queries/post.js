@@ -14,6 +14,7 @@ const post = {
       VALUES ($1, $2, $3, $4, $5)
       RETURNING *
   `,
+  // split sql dynamically created during post request. see routes/transaction
   split: 'INSERT INTO "splits" ("transactionIdRef", "itemIdRef", "splitAmount") Values'
 };
 

@@ -1,5 +1,6 @@
 const { check } = require('../utility-functions');
 
+// checks that req.body has expected properties with valid values
 const validateItem = (req, res, next) => {
   const { itemOrder, groupIdRef } = req.body;
 

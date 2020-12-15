@@ -1,5 +1,6 @@
 const { check } = require('../utility-functions');
 
+// checks that req.body has expected properties with valid values
 const validateTransaction = (req, res, next) => {
   const { transactionDate, splits } = req.body;
 
