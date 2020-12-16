@@ -7,6 +7,7 @@ const { validateMonth } = require('../middleware');
 const getMonth = app => {
   app.get('/api/month/:monthId', validateMonth, (req, res, next) => {
     const { monthId } = req.params;
+
     db.query(get.month, [monthId])
       .then(data => {
         check.id(data);
