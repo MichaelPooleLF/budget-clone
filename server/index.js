@@ -3,7 +3,7 @@ const express = require('express');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
 const { handlePathError, sendError } = require('./middleware');
-const { get, post } = require('./routes');
+const { get, post, update, deleteFrom } = require('./routes');
 
 const app = express();
 
@@ -20,6 +20,14 @@ get.month(app); // retrieve budget by monthId
 post.group(app); // add a new group
 post.item(app); // add a new group item
 post.transaction(app); // add a new transaction
+
+// UPDATE METHODS
+update.group(app);
+update.item(app);
+
+// DELETE METHODS
+deleteFrom.groups(app);
+deleteFrom.items(app);
 
 // ERROR HANDLERS
 handlePathError(app); // handles unhandled requests on paths with root "/api"

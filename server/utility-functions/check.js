@@ -31,8 +31,8 @@ const check = {
   },
 
   contains: (value, property) => {
-    if (!value) {
-      const message = `${property} is not defined in the body.`;
+    if (value !== '' && !value) {
+      const message = `${property} is not defined.`;
       throw new ClientError(message, 400);
     }
   },
@@ -41,6 +41,43 @@ const check = {
     if (!Date.parse(date)) {
       const message = `${date} is not a valid date. Valid date format should follow YYYY-MM-DD`;
       throw new ClientError(message, 400);
+    }
+  },
+
+  booleanString: string => {
+    if (string !== 'true' && string !== 'false') {
+      const message = `${string} is not a valid string. Expected 'true' or 'false'.`;
+      throw new ClientError(message, 400);
+    }
+  },
+
+  notNullOrUndefined: (value, property) => {
+    if (value === null || value === undefined) {
+      const message = `${property} can not be ${value}`;
+      throw new ClientError(message, 400);
+    }
+  },
+
+  groupTableColName: colName => {
+    switch (colName) {
+      case 'groupOrder':
+      case 'groupName':
+        break;
+      default:
+        throw new ClientError(`${colName} is not a column on the budgetGroup table`, 400);
+    }
+  },
+
+  itemTableColName: colName => {
+    switch (colName) {
+      case 'itemName':
+      case 'repeat':
+      case 'itemOrder':
+      case 'planned':
+      case 'dueDate':
+        break;
+      default:
+        throw new ClientError(`${colName} is not a column on the budgetItem table`, 400);
     }
   }
 };
