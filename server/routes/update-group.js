@@ -4,12 +4,12 @@ const { update } = require('../sql-queries');
 const { check } = require('../utility-functions');
 
 const updateGroup = app => {
-  app.put('/api/group/:groupId', validateGroupPut, (req, res, next) => {
-    const { groupId } = req.params;
-    const { groupOrder, groupName } = req.body;
-    const params = [groupOrder, groupName, groupId];
+  app.put('/api/group/:groupId/:colName', validateGroupPut, (req, res, next) => {
+    const { colName, groupId } = req.params;
+    const { colVal } = req.body;
+    const params = [colVal, groupId];
 
-    db.query(update.group, params)
+    db.query(update.group.at(colName), params)
       .then(data => {
         check.id(data);
         res.status(200).json(data.rows[0]);

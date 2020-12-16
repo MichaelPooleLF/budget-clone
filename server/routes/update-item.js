@@ -9,7 +9,7 @@ const updateGroup = app => {
     const { colVal } = req.body;
     const params = [colVal, itemId];
 
-    db.query(update.item.update(colName), params)
+    db.query(update.item.at(colName), params)
       .then(data => {
         check.id(data);
         res.status(200).json(data.rows[0]);

@@ -58,6 +58,16 @@ const check = {
     }
   },
 
+  groupTableColName: colName => {
+    switch (colName) {
+      case 'groupOrder':
+      case 'groupName':
+        break;
+      default:
+        throw new ClientError(`${colName} is not a column on the budgetGroup table`, 400);
+    }
+  },
+
   itemTableColName: colName => {
     switch (colName) {
       case 'itemName':

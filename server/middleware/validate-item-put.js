@@ -4,9 +4,9 @@ const validateItemPut = (req, res, next) => {
   const { colName, itemId } = req.params;
   const { colVal } = req.body;
 
-  check.contains(colName, 'the column name');
+  check.contains(colName, 'colName');
   check.itemTableColName(colName);
-  check.contains(colVal, 'the column value');
+  check.contains(colVal, 'colVal');
   switch (colName) {
     case 'itemOrder':
       check.int(colVal);

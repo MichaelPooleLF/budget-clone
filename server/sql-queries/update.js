@@ -1,11 +1,29 @@
 const update = {
-  group: `
-    UPDATE  "budgetGroup"
-      SET   "groupOrder"  = $1,
-            "groupName"   = $2
-      WHERE "groupId"     = $3
-      RETURNING *
-  `,
+  group: {
+    columnSet: '',
+
+    setCurrentValue(colName) {
+      switch (colName) {
+        case 'groupOrder':
+          this.columnSet = 'SET "groupOrder" = $1';
+          break;
+        case 'groupName':
+          this.columnSet = 'SET "groupName" = $1';
+          break;
+      }
+    },
+
+    at(colName) {
+      this.setCurrentValue(colName);
+
+      return `
+        UPDATE  "budgetGroup"
+          ${this.columnSet}
+          WHERE "groupId" = $2
+          RETURNING *
+      `;
+    }
+  },
 
   item: {
     columnSet: '',
@@ -30,7 +48,7 @@ const update = {
       }
     },
 
-    update(colName) {
+    at(colName) {
       this.setCurrentValue(colName);
 
       return `
