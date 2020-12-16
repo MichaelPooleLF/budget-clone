@@ -1,5 +1,5 @@
 const deleteFrom = {
-  group: `
+  groups: `
     DELETE FROM "budgetGroup"
       WHERE     "groupId" = $1
       RETURNING *
