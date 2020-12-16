@@ -16,6 +16,7 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER TABLE IF EXISTS ONLY public."budgetItems" DROP CONSTRAINT IF EXISTS "budgetItems_groupIdRef_fkey";
 ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_pkey;
 ALTER TABLE IF EXISTS ONLY public.transactions DROP CONSTRAINT IF EXISTS transactions_pkey;
 ALTER TABLE IF EXISTS ONLY public.splits DROP CONSTRAINT IF EXISTS splits_pkey;
@@ -318,8 +319,8 @@ ALTER TABLE ONLY public.users ALTER COLUMN "userId" SET DEFAULT nextval('public.
 --
 
 COPY public."budgetGroup" ("groupId", "groupOrder", "monthId", "groupName", "budgetType") FROM stdin;
-1	1	1	Giving	expense
 2	2	1	Housing	expense
+1	1	1	Giving	expense
 \.
 
 
@@ -328,9 +329,9 @@ COPY public."budgetGroup" ("groupId", "groupOrder", "monthId", "groupName", "bud
 --
 
 COPY public."budgetItems" ("itemId", "itemName", repeat, "itemOrder", planned, "dueDate", "groupIdRef") FROM stdin;
-3	Label	false	2	0.00	\N	1
 1	Charity	false	1	0.00	\N	1
-4	Label	false	3	0.00	\N	1
+3	New Name	false	3	0.00	\N	1
+4	Label	false	2	50.00	2020-12-16	1
 \.
 
 
@@ -377,14 +378,14 @@ COPY public.users ("userId", "userName") FROM stdin;
 -- Name: budgetGroup_budgetGroupId_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."budgetGroup_budgetGroupId_seq"', 11, true);
+SELECT pg_catalog.setval('public."budgetGroup_budgetGroupId_seq"', 17, true);
 
 
 --
 -- Name: budgetItems_budgetItemId_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."budgetItems_budgetItemId_seq"', 4, true);
+SELECT pg_catalog.setval('public."budgetItems_budgetItemId_seq"', 13, true);
 
 
 --
@@ -461,6 +462,14 @@ ALTER TABLE ONLY public.transactions
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY ("userId");
+
+
+--
+-- Name: budgetItems budgetItems_groupIdRef_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."budgetItems"
+    ADD CONSTRAINT "budgetItems_groupIdRef_fkey" FOREIGN KEY ("groupIdRef") REFERENCES public."budgetGroup"("groupId") ON DELETE CASCADE;
 
 
 --
