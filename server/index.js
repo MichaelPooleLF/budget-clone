@@ -3,7 +3,7 @@ const express = require('express');
 const staticMiddleware = require('./static-middleware');
 const sessionMiddleware = require('./session-middleware');
 const { handlePathError, sendError } = require('./middleware');
-const { get, post, update } = require('./routes');
+const { get, post, update, deleteFrom } = require('./routes');
 
 const app = express();
 
@@ -24,6 +24,9 @@ post.transaction(app); // add a new transaction
 // UPDATE METHODS
 update.group(app);
 update.item(app);
+
+// DELETE METHODS
+deleteFrom.group(app);
 
 // ERROR HANDLERS
 handlePathError(app); // handles unhandled requests on paths with root "/api"

@@ -5,6 +5,7 @@ const postItem = require('./post-item');
 const postTransaction = require('./post-transaction');
 const updateGroup = require('./update-group');
 const updateItem = require('./update-item');
+const deleteGroup = require('./delete-group');
 
 module.exports = {
   get: {
@@ -21,5 +22,9 @@ module.exports = {
   update: {
     group: updateGroup,
     item: updateItem
+  },
+
+  deleteFrom: {
+    group: deleteGroup
   }
 };
