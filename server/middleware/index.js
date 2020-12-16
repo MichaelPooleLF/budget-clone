@@ -1,6 +1,7 @@
 const validateMonth = require('./validate-month');
 const validateGroup = require('./validate-group');
 const validateGroupPut = require('./validate-group-put');
+const validateGroupDelete = require('./validate-group-delete');
 const validateItem = require('./validate-item');
 const validateItemPut = require('./validate-item-put');
 const validateTransaction = require('./validate-transaction');
@@ -11,6 +12,7 @@ module.exports = {
   validateMonth,
   validateGroup,
   validateGroupPut,
+  validateGroupDelete,
   validateItem,
   validateItemPut,
   validateTransaction,

@@ -26,7 +26,8 @@ update.group(app);
 update.item(app);
 
 // DELETE METHODS
-deleteFrom.group(app);
+deleteFrom.groups(app);
+deleteFrom.items(app);
 
 // ERROR HANDLERS
 handlePathError(app); // handles unhandled requests on paths with root "/api"
