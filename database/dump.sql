@@ -182,8 +182,9 @@ ALTER SEQUENCE public."months_monthId_seq" OWNED BY public.months."monthId";
 CREATE TABLE public.splits (
     "splitId" integer NOT NULL,
     "splitAmount" numeric(14,2) NOT NULL,
-    "itemIdRef" integer NOT NULL,
-    "transactionIdRef" integer NOT NULL
+    "itemIdRef" integer,
+    "transactionIdRef" integer NOT NULL,
+    "monthId" integer NOT NULL
 );
 
 
@@ -332,6 +333,7 @@ COPY public."budgetItems" ("itemId", "itemName", repeat, "itemOrder", planned, "
 1	Charity	false	1	0.00	\N	1
 3	New Name	false	3	0.00	\N	1
 4	Label	false	2	50.00	2020-12-16	1
+15	Label	false	4	0.00	\N	2
 \.
 
 
@@ -348,10 +350,11 @@ COPY public.months ("monthId", month, year, "userId") FROM stdin;
 -- Data for Name: splits; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.splits ("splitId", "splitAmount", "itemIdRef", "transactionIdRef") FROM stdin;
-1	10.00	1	1
-3	5.00	3	1
-4	3.00	4	2
+COPY public.splits ("splitId", "splitAmount", "itemIdRef", "transactionIdRef", "monthId") FROM stdin;
+1	10.00	1	1	1
+3	5.00	3	1	1
+4	3.00	4	2	1
+5	20.00	15	3	1
 \.
 
 
@@ -362,6 +365,7 @@ COPY public.splits ("splitId", "splitAmount", "itemIdRef", "transactionIdRef") F
 COPY public.transactions ("transactionId", "transactionType", deleted, "checkNum", note, "transactionDate", "transactionName") FROM stdin;
 1	expense	false	\N	\N	2020-12-02	\N
 2	expense	false	\N	\N	2020-12-14	\N
+3	expense	false	\N	\N	2020-12-17	\N
 \.
 
 
@@ -385,7 +389,7 @@ SELECT pg_catalog.setval('public."budgetGroup_budgetGroupId_seq"', 17, true);
 -- Name: budgetItems_budgetItemId_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."budgetItems_budgetItemId_seq"', 13, true);
+SELECT pg_catalog.setval('public."budgetItems_budgetItemId_seq"', 15, true);
 
 
 --
@@ -399,14 +403,14 @@ SELECT pg_catalog.setval('public."months_monthId_seq"', 1, true);
 -- Name: splits_splitId_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."splits_splitId_seq"', 4, true);
+SELECT pg_catalog.setval('public."splits_splitId_seq"', 5, true);
 
 
 --
 -- Name: transactions_transactionId_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."transactions_transactionId_seq"', 2, true);
+SELECT pg_catalog.setval('public."transactions_transactionId_seq"', 3, true);
 
 
 --

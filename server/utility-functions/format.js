@@ -79,11 +79,12 @@ const format = {
       // creates a split in splitStore at splitId if it does not exist
       splitStore: (splitStore, splitId) => {
         if (!splitStore[splitId]) {
-          const { itemIdRef, transactionIdRef, splitAmount } = dataObj;
+          const { itemIdRef, transactionIdRef, splitAmount, monthId } = dataObj;
           splitStore[splitId] = {
             itemIdRef,
             transactionIdRef,
-            splitAmount
+            splitAmount,
+            monthId
           };
         }
       },
@@ -91,11 +92,12 @@ const format = {
       // creates a split on item at splitId if it does not exist
       split: (itemSplits, splitId) => {
         if (!itemSplits[splitId]) {
-          const { itemIdRef, transactionIdRef, splitAmount } = dataObj;
+          const { itemIdRef, transactionIdRef, splitAmount, monthId } = dataObj;
           itemSplits[splitId] = {
             itemIdRef,
             transactionIdRef,
             splitAmount,
+            monthId,
             transaction: {}
           };
         }
