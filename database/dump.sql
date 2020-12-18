@@ -16,6 +16,7 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER TABLE IF EXISTS ONLY public.splits DROP CONSTRAINT IF EXISTS "splits_itemIdRef_fkey";
 ALTER TABLE IF EXISTS ONLY public."budgetItems" DROP CONSTRAINT IF EXISTS "budgetItems_groupIdRef_fkey";
 ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_pkey;
 ALTER TABLE IF EXISTS ONLY public.transactions DROP CONSTRAINT IF EXISTS transactions_pkey;
@@ -333,7 +334,6 @@ COPY public."budgetItems" ("itemId", "itemName", repeat, "itemOrder", planned, "
 1	Charity	false	1	0.00	\N	1
 3	New Name	false	3	0.00	\N	1
 4	Label	false	2	50.00	2020-12-16	1
-15	Label	false	4	0.00	\N	2
 \.
 
 
@@ -354,7 +354,7 @@ COPY public.splits ("splitId", "splitAmount", "itemIdRef", "transactionIdRef", "
 1	10.00	1	1	1
 3	5.00	3	1	1
 4	3.00	4	2	1
-5	20.00	15	3	1
+5	20.00	\N	3	1
 \.
 
 
@@ -474,6 +474,14 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public."budgetItems"
     ADD CONSTRAINT "budgetItems_groupIdRef_fkey" FOREIGN KEY ("groupIdRef") REFERENCES public."budgetGroup"("groupId") ON DELETE CASCADE;
+
+
+--
+-- Name: splits splits_itemIdRef_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.splits
+    ADD CONSTRAINT "splits_itemIdRef_fkey" FOREIGN KEY ("itemIdRef") REFERENCES public."budgetItems"("itemId") ON DELETE SET NULL;
 
 
 --
