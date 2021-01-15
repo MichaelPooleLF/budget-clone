@@ -6,7 +6,8 @@ const useStyles = makeStyles({
   budgetPage: {
     position: 'fixed',
     top: '0',
-    left: props => props.left ? props.left : '0'
+    left: props => props.left ? props.left : '0',
+    padding: '0 3rem'
   }
 });
 

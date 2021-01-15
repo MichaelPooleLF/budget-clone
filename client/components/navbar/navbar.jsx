@@ -18,7 +18,7 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    borderBottom: '1px solid #f5f7f8'
+    borderBottom: '2px solid #f5f7f8'
   }
 });
 
