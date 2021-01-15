@@ -3,6 +3,7 @@ import { Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Header from './header';
 import Item from './item';
+import Footer from './footer';
 
 const useStyles = makeStyles({
   paperWrapper: {
@@ -16,6 +17,7 @@ function BudgetGroup(props) {
     <Paper className={classes.paperWrapper} >
       <Header/>
       <Item/>
+      <Footer/>
     </Paper>
   );
 }
