@@ -5,9 +5,10 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
   budgetPage: {
-    position: 'fixed',
+    position: 'absolute',
     top: '0',
     left: props => props.left ? props.left : '0',
+    marginTop: '10rem',
     padding: '0 3rem'
   }
 });
@@ -16,8 +17,13 @@ function BudgetPage(props) {
   const classes = useStyles(props);
   return (
     <main className={classes.budgetPage}>
-      <BudgetHeader/>
-      <BudgetGroup/>
+      <BudgetHeader />
+      <BudgetGroup />
+      <BudgetGroup />
+      <BudgetGroup />
+      <BudgetGroup />
+      <BudgetGroup />
+      <BudgetGroup />
     </main>
   );
 }

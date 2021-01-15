@@ -4,7 +4,8 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles({
   budgetHeader: {
     boxSizing: 'border-box',
-    position: 'relative',
+    position: 'fixed',
+    top: '0',
     zIndex: '1000',
     width: '700px',
     height: '125px',
