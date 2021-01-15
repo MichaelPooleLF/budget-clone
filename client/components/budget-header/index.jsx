@@ -4,11 +4,14 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles({
   budgetHeader: {
     boxSizing: 'border-box',
+    position: 'relative',
+    zIndex: '1000',
     width: '700px',
     height: '125px',
     padding: '1rem 0',
     display: 'flex',
     flexDirection: 'column',
+    backgroundColor: '#f5f7f8',
     justifyContent: 'center',
     borderBottom: '1px solid #b6bec2'
   },
