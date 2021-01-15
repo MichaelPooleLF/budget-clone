@@ -5,7 +5,9 @@ import StyledIcon from '../icon/styledIcon';
 function Navbar(props) {
   return (
     <>
-      <StyledIcon icon={LocalAtm} fontSize="5rem" color="green"/>
+      <div className="sidebar">
+        <StyledIcon icon={LocalAtm} fontSize="5rem" color="green"/>
+      </div>
     </>
   );
 }
