@@ -16,9 +16,11 @@ function BudgetGroup(props) {
   const classes = useStyles(props);
   return (
     <Paper className={classes.paperWrapper} >
-      <Header/>
-      <Item/>
-      <Footer/>
+        <Header />
+        <Item />
+        <Item />
+        <Item />
+        <Footer />
     </Paper>
   );
 }

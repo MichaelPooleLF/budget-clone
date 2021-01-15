@@ -13,15 +13,16 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center'
   },
-  underlined: {
-    borderBottom: '1px solid #d5d9db'
+  item: {
+    borderBottom: '1px solid #d5d9db',
+    padding: '0.25rem 0'
   }
 });
 
 function Item(props) {
   const classes = useStyles(props);
   return (
-    <Grid className={classes.underlined} container spacing={3}>
+    <Grid className={classes.item} container>
       <Grid className={classes.centered} item xs={6}>
         <Input
           value="Paycheck"

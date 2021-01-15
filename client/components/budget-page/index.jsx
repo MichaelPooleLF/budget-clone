@@ -9,7 +9,8 @@ const useStyles = makeStyles({
     top: '0',
     left: props => props.left ? props.left : '0',
     marginTop: '9rem',
-    padding: '0 3rem'
+    padding: '0 3rem',
+    width: '700px'
   }
 });
 
