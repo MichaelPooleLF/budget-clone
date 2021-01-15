@@ -1,7 +1,13 @@
 import React from 'react';
+import { LocalAtm } from '@material-ui/icons';
+import StyledIcon from '../icon/styledIcon';
 
-export default function Navbar(props) {
+function Navbar(props) {
   return (
-    <h1>Navbar</h1>
+    <>
+      <StyledIcon icon={LocalAtm} fontSize="5rem" color="green"/>
+    </>
   );
 }
+
+export default Navbar;
