@@ -1,5 +1,6 @@
 import React from 'react';
 import BudgetHeader from '../budget-header';
+import BudgetGroup from '../budget-group';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
@@ -16,6 +17,7 @@ function BudgetPage(props) {
   return (
     <main className={classes.budgetPage}>
       <BudgetHeader/>
+      <BudgetGroup/>
     </main>
   );
 }
