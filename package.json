@@ -96,13 +96,14 @@
   },
   "homepage": "https://github.com/MichaelPooleLF/budget-clone#readme",
   "dependencies": {
+    "@material-ui/core": "4.11.2",
+    "@material-ui/icons": "4.11.2",
     "bootstrap": "4.5.3",
     "dotenv": "8.2.0",
     "express": "4.17.1",
     "express-session": "1.17.1",
     "pg": "8.5.1",
     "react": "17.0.1",
-    "react-bootstrap": "1.4.0",
     "react-dom": "17.0.1",
     "react-router": "5.2.0",
     "session-file-store": "1.5.0"

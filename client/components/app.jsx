@@ -1,5 +1,12 @@
 import React from 'react';
+import Navbar from './navbar';
+import BudgetPage from './budget-page';
 
 export default function App(props) {
-  return <h1>Hello World, I am new!</h1>;
+  return (
+    <>
+      <Navbar width="290px"/>
+      <BudgetPage left="290px"/>
+    </>
+  );
 }
