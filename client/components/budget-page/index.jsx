@@ -1,5 +1,5 @@
 import React from 'react';
-import BudgetHeader from '../budget-header/budget-header';
+import BudgetHeader from '../budget-header';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({

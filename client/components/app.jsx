@@ -1,6 +1,6 @@
 import React from 'react';
-import Navbar from './navbar/navbar';
-import BudgetPage from './budget-page/budget-page';
+import Navbar from './navbar';
+import BudgetPage from './budget-page';
 
 export default function App(props) {
   return (
