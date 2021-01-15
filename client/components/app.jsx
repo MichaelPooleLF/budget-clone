@@ -4,7 +4,7 @@ import Navbar from './navbar/navbar';
 export default function App(props) {
   return (
     <>
-      <Navbar/>
+      <Navbar width="290px"/>
     </>
   );
 }
