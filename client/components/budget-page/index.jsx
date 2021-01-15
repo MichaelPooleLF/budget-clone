@@ -8,7 +8,7 @@ const useStyles = makeStyles({
     position: 'absolute',
     top: '0',
     left: props => props.left ? props.left : '0',
-    marginTop: '10rem',
+    marginTop: '9rem',
     padding: '0 3rem'
   }
 });

@@ -7,7 +7,8 @@ import Footer from './footer';
 
 const useStyles = makeStyles({
   paperWrapper: {
-    padding: '0 2rem'
+    padding: '0 2rem',
+    margin: '2rem auto'
   }
 });
 
