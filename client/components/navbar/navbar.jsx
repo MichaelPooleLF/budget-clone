@@ -19,11 +19,6 @@ const useStyles = makeStyles({
     justifyContent: 'center',
     alignItems: 'center',
     borderBottom: '1px solid #f5f7f8'
-  },
-  test: {
-    position: 'fixed',
-    top: '0',
-    left: '290px'
   }
 });
 
