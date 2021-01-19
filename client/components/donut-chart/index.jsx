@@ -1,6 +1,29 @@
 import React from 'react';
-// import Chart from 'chart.js';
+import { PieChart, Pie } from 'recharts';
 import { makeStyles } from '@material-ui/core/styles';
+
+const dataSet = [
+  {
+    name: 'test one',
+    value: 100.00
+  },
+  {
+    name: 'test two',
+    value: 200.00
+  },
+  {
+    name: 'test three',
+    value: 300.00
+  },
+  {
+    name: 'test four',
+    value: 400.00
+  },
+  {
+    name: 'test five',
+    value: 500.00
+  }
+];
 
 const useStyles = makeStyles({
   chart: {
@@ -17,7 +40,9 @@ export default function DonutChart(props) {
   return (
     <div className={classes.chart}>
       <h1>Donut Chart</h1>
-      <canvas id="budgetChart"></canvas>
+      <PieChart width={400} height={400}>
+        <Pie data={dataSet} nameKey={name} cx="50%" cy="50%" outerRadius={80} fill="#82ca9d" label />
+      </PieChart>
     </div>
   );
 }
