@@ -27,7 +27,7 @@ function Item(props) {
         <Input
           value="Paycheck"
           name="Paycheck budget item"
-          autoComplete
+          autoComplete="true"
           disableUnderline
           fullWidth
           />
@@ -37,7 +37,7 @@ function Item(props) {
           className={classes.alignRight}
           value="$1,500.00"
           name="Paycheck planned"
-          autoComplete
+          autoComplete="true"
           disableUnderline
           fullWidth
         />
