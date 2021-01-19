@@ -40,8 +40,19 @@ export default function DonutChart(props) {
   return (
     <div className={classes.chart}>
       <h1>Donut Chart</h1>
-      <PieChart width={400} height={400}>
-        <Pie data={dataSet} nameKey={name} cx="50%" cy="50%" outerRadius={80} fill="#82ca9d" label />
+      <PieChart
+        width={400}
+        height={400}
+        >
+        <Pie
+          data={dataSet}
+          nameKey={name}
+          cx="50%"
+          cy="50%"
+          innerRadius={70}
+          outerRadius={80}
+          fill="#82ca9d"
+          label />
       </PieChart>
     </div>
   );
