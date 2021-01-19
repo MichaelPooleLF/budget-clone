@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PieChart, Pie, Tooltip, Label } from 'recharts';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -39,7 +39,16 @@ const useStyles = makeStyles({
 });
 
 export default function DonutChart(props) {
+  const [sliceName, updateName] = useState(dataSet[0].name);
+  const [sliceValue, updateValue] = useState(dataSet[0].value);
+  const chartTitle = `${sliceName} ${sliceValue}`;
   const classes = useStyles();
+
+  function updateTitle(event) {
+    updateName(event.name);
+    updateValue(event.value);
+  }
+
   return (
     <div className={classes.chart}>
       <h1>Donut Chart</h1>
@@ -49,16 +58,14 @@ export default function DonutChart(props) {
         >
         <Pie
           data={dataSet}
-          dataKey="value"
-          nameKey="name"
-          cx="50%"
-          cy="50%"
           innerRadius={80}
           outerRadius={90}
           fill="#82ca9d"
+          isAnimationActive={false}
+          onMouseOver={e => updateTitle(e)}
           >
             <Label
-              value="TEST TITLE"
+              value={chartTitle}
               position="center"
               />
           </Pie>
