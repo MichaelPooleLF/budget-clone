@@ -1,4 +1,5 @@
 import React from 'react';
+// import Chart from 'chart.js';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
@@ -14,6 +15,9 @@ const useStyles = makeStyles({
 export default function DonutChart(props) {
   const classes = useStyles();
   return (
-    <h1 className={classes.chart}>Donut Chart</h1>
+    <div className={classes.chart}>
+      <h1>Donut Chart</h1>
+      <canvas id="budgetChart"></canvas>
+    </div>
   );
 }
