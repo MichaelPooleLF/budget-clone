@@ -1,5 +1,5 @@
 import React from 'react';
-import { PieChart, Pie } from 'recharts';
+import { PieChart, Pie, Tooltip, Label } from 'recharts';
 import { makeStyles } from '@material-ui/core/styles';
 
 const dataSet = [
@@ -31,7 +31,10 @@ const useStyles = makeStyles({
     top: '0',
     left: '1086px',
     right: '0',
-    textAlign: 'center'
+    textAlign: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    flexDirection: 'column'
   }
 });
 
@@ -41,18 +44,25 @@ export default function DonutChart(props) {
     <div className={classes.chart}>
       <h1>Donut Chart</h1>
       <PieChart
-        width={400}
-        height={400}
+        width={300}
+        height={190}
         >
         <Pie
           data={dataSet}
-          nameKey={name}
+          dataKey="value"
+          nameKey="name"
           cx="50%"
           cy="50%"
-          innerRadius={70}
-          outerRadius={80}
+          innerRadius={80}
+          outerRadius={90}
           fill="#82ca9d"
-          label />
+          >
+            <Label
+              value="TEST TITLE"
+              position="center"
+              />
+          </Pie>
+          <Tooltip/>
       </PieChart>
     </div>
   );
