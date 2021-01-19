@@ -1,29 +1,7 @@
 import React, { useState } from 'react';
+import { dataSet } from './dataset.json';
 import { PieChart, Pie, Tooltip, Label } from 'recharts';
 import { makeStyles } from '@material-ui/core/styles';
-
-const dataSet = [
-  {
-    name: 'test one',
-    value: 100.00
-  },
-  {
-    name: 'test two',
-    value: 200.00
-  },
-  {
-    name: 'test three',
-    value: 300.00
-  },
-  {
-    name: 'test four',
-    value: 400.00
-  },
-  {
-    name: 'test five',
-    value: 500.00
-  }
-];
 
 const useStyles = makeStyles({
   chart: {
